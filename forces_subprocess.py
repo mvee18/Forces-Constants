@@ -8,7 +8,7 @@ differential = 0.005
 reset = np.genfromtxt('geom.xyz', skip_header=1, usecols=(1,2,3))
 raw_data = np.genfromtxt('geom.xyz', skip_header=1, usecols=(1,2,3))
 labels = np.genfromtxt('geom.xyz', skip_header=1, dtype=str, usecols=0)
-memory_list = [495]
+memory_list = [50]
 
 # This outputs as (rows,cols):
 size = raw_data.shape
@@ -17,7 +17,7 @@ input_list = []
 for i in range(num_of_jobs):
     input_list.append(i)
 
-def gen_com(differentialtype):
+def gen_com():
     for i in range(num_of_jobs):
         temp = open('tmp.txt', 'r')
         f = open("input.com", 'w+')
@@ -36,6 +36,10 @@ def gen_com(differentialtype):
         f.write("{CCSD(T)-F12}")
         f.close()
         temp.close()
+
+def save_and_gen():
+    np.savetxt("tmp.txt", neg_dif, delimiter=" ", fmt='%s')
+    gen_com()
 
 # First derivatives.
 
@@ -56,6 +60,8 @@ positives = []
 negatives = []
 minusplus = []
 plusminus = []
+doublepositives = []
+doublenegatives = []
 
 def extract_energy(posorneg):
     if posorneg == "pos_dif":
@@ -90,6 +96,22 @@ def extract_energy(posorneg):
             if "!CCSD(T)-F12b total energy" in line:
                 line = line.split()
                 plusminus.append(line[3])
+    elif posorneg == "doublepositives":
+        sub_job()
+        zz = open("input.out", 'r')
+        zzz = zz.readlines()
+        for line in zzz:
+            if "!CCSD(T)-F12b total energy" in line:
+                line = line.split()
+                plusminus.append(line[3])
+    elif posorneg == "doublenegatives":
+        sub_job()
+        zz = open("input.out", 'r')
+        zzz = zz.readlines()
+        for line in zzz:
+            if "!CCSD(T)-F12b total energy" in line:
+                line = line.split()
+                plusminus.append(line[3])
 
 def sub_job():
     subprocess.call("mpiexec molpro.exe input.com", shell=True)
@@ -102,7 +124,7 @@ for rows in range(size[0]):
         raw_data[rows,cols] = raw_data[rows,cols] + differential
         pos_dif = np.column_stack((labels,raw_data))
         np.savetxt("tmp.txt", pos_dif, delimiter=" ", fmt='%s')
-        gen_com(pos_dif)
+        gen_com()
         extract_energy("pos_dif")
         raw_data[rows,cols] = reset[rows,cols]
 
@@ -111,7 +133,7 @@ for i in range(size[0]):
         raw_data[rows,cols] = raw_data[rows,cols] - differential
         neg_dif = np.column_stack((labels,raw_data))
         np.savetxt("tmp.txt", neg_dif, delimiter=" ", fmt='%s')
-        gen_com(neg_dif)
+        gen_com()
         extract_energy("neg_dif")
         raw_data[rows,cols] = reset[rows,cols]
 
@@ -135,6 +157,8 @@ a = positives
 b = plusminus
 c = minusplus
 d = negatives
+e = doublepositives
+f = doublenegatives
 
 # This is for all ways to add two terms together (+dy,+dx [+dz] term): positives.
 for rows in range(size[0]):
@@ -145,12 +169,16 @@ for rows in range(size[0]):
             if items == cols:
                 raw_data[rows,cols] = raw_data[rows,cols] + differential*2
                 data = np.column_stack((labels,raw_data))
+                save_and_gen()
+                sub_job("doublepositives")
                 print(data)
                 raw_data[rows,cols] = reset[rows,cols]
             elif items > cols:
                 raw_data[rows,cols] = raw_data[rows,cols] + differential
                 raw_data[rows,items] = raw_data[rows,items] + differential
                 data = np.column_stack((labels,raw_data))
+                save_and_gen()
+                sub_job("positives")
                 print(data)
                 raw_data[rows,cols] = reset[rows,cols]
                 raw_data[rows,items] = reset[rows,items]
@@ -165,6 +193,8 @@ for rows in range(size[0]):
                 raw_data[rows,cols] = raw_data[rows,cols] + differential
                 raw_data[rows,items] = raw_data[rows,items] - differential
                 data = np.column_stack((labels,raw_data))
+                save_and_gen()
+                sub_job("minusplus")
                 print(data)
                 raw_data[rows,cols] = reset[rows,cols]
                 raw_data[rows,items] = reset[rows,items]
@@ -173,6 +203,8 @@ for rows in range(size[0]):
                 raw_data[rows,cols] = raw_data[rows,cols] + differential
                 raw_data[rows,items] = raw_data[rows,items] - differential
                 data = np.column_stack((labels,raw_data))
+                save_and_gen()
+                sub_job("plusminus")
                 print(data)
                 raw_data[rows,cols] = reset[rows,cols]
                 raw_data[rows,items] = reset[rows,items]
@@ -186,12 +218,16 @@ for rows in range(size[0]):
             if items == cols:
                 raw_data[rows,cols] = raw_data[rows,cols] - differential*2
                 data = np.column_stack((labels,raw_data))
+                save_and_gen()
+                sub_job("doublenegatives")
                 print(data)
                 raw_data[rows,cols] = reset[rows,cols]
             elif items > cols:
                 raw_data[rows,cols] = raw_data[rows,cols] - differential
                 raw_data[rows,items] = raw_data[rows,items] - differential
                 data = np.column_stack((labels,raw_data))
+                save_and_gen()
+                sub_job("negatives")
                 print(data)
                 raw_data[rows,cols] = reset[rows,cols]
                 raw_data[rows,items] = reset[rows,items]
