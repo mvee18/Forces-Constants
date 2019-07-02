@@ -64,7 +64,7 @@ def second_derivative_a():
 # More complicated second derivatives:
 def second_derivative_b():
     for i in range(len(a)):
-        second_energy_b = (a[i]-b[i]-c[i]+d[i])/(8*differential)
+        second_energy_b = (a[i]-b[i]-c[i]+d[i])/(4*(differential)**2)
         print(second_energy_b)
 
 positives = []
