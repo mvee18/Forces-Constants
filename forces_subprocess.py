@@ -18,24 +18,23 @@ for i in range(num_of_jobs):
     input_list.append(i)
 
 def gen_com():
-    for i in range(num_of_jobs):
-        temp = open('tmp.txt', 'r')
-        f = open("input.com", 'w+')
-        f.write("memory,%d,m\n" %memory_list[0])
-        f.write("\nnocompress;\n")
-        f.write("geomtyp=xyz\n")
-        f.write("angstrom\n")
-        f.write("geometry={\n")
-        f.write(temp.read())
-        f.write("}")
-        f.write("\n")
-        f.write("basis=cc-pVTZ-F12\n")
-        f.write("set,charge=0\n")
-        f.write("set,spin=0\n")
-        f.write("hf\n")
-        f.write("{CCSD(T)-F12}")
-        f.close()
-        temp.close()
+    temp = open('tmp.txt', 'r')
+    f = open("input.com", 'w+')
+    f.write("memory,%d,m\n" %memory_list[0])
+    f.write("\nnocompress;\n")
+    f.write("geomtyp=xyz\n")
+    f.write("angstrom\n")
+    f.write("geometry={\n")
+    f.write(temp.read())
+    f.write("}")
+    f.write("\n")
+    f.write("basis=cc-pVTZ-F12\n")
+    f.write("set,charge=0\n")
+    f.write("set,spin=0\n")
+    f.write("hf\n")
+    f.write("{CCSD(T)-F12}")
+    f.close()
+    temp.close()
 
 def save_and_gen():
     np.savetxt("tmp.txt", data, delimiter=" ", fmt='%s')
@@ -65,7 +64,7 @@ def second_derivative_a():
 # More complicated second derivatives:
 def second_derivative_b():
     for i in range(len(a)):
-        second_energy_b = (a[i]-b[i]-c[i]+d[i])/(4*a[i])
+        second_energy_b = (a[i]-b[i]-c[i]+d[i])/(8*differential)
         print(second_energy_b)
 
 positives = []
@@ -129,7 +128,6 @@ def sub_job():
     subprocess.call("mpiexec molpro.exe input.com", shell=True)
     return
 
-"""
 #After header, we will have to do the submission.
 for rows in range(size[0]):
     for cols in range(size[1]):
@@ -154,7 +152,7 @@ print(negatives)
 
 positives.clear()
 negatives.clear()
-"""
+
 # Second derivatives.
 # We need the following pairs: [(x1,xn),(y1,yn),(z1.zn),(x1,yn),(x1,zn),(y1,zn)], without repeating.
 
