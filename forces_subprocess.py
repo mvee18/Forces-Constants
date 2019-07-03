@@ -154,6 +154,8 @@ for i in range(size[0]):
         extract_energy("negatives")
         raw_data[rows,cols] = reset[rows,cols]
 
+first_derivative()
+
 print(positives)
 print(negatives)
 
@@ -207,8 +209,8 @@ for rows in range(size[0]):
         print(cols)
         for items in range(size[0]):
             if items < cols:
-                raw_data[rows,cols] = raw_data[rows,cols] + differential
-                raw_data[rows,items] = raw_data[rows,items] - differential
+                raw_data[rows,cols] = raw_data[rows,cols] - differential
+                raw_data[rows,items] = raw_data[rows,items] + differential
                 data = np.column_stack((labels,raw_data))
                 save_and_gen()
                 extract_energy("minusplus")
@@ -216,7 +218,12 @@ for rows in range(size[0]):
                 raw_data[rows,cols] = reset[rows,cols]
                 raw_data[rows,items] = reset[rows,items]
 #These are the (x,-y),(x,-z),(y,-z) terms.
-            elif items > cols:
+for rows in range(size[0]):
+    print(rows)
+    for cols in range(size[1]):
+        print(cols)
+        for items in range(size[0]):
+            if items < cols:
                 raw_data[rows,cols] = raw_data[rows,cols] + differential
                 raw_data[rows,items] = raw_data[rows,items] - differential
                 data = np.column_stack((labels,raw_data))
@@ -225,7 +232,6 @@ for rows in range(size[0]):
                 print(data)
                 raw_data[rows,cols] = reset[rows,cols]
                 raw_data[rows,items] = reset[rows,items]
-        print(cols)
 #These are the (-x,-x,): negatives.
 for rows in range(size[0]):
     print(rows)
