@@ -172,12 +172,12 @@ negatives.clear()
 # Most significantly, this prevents double counting.
 
 # Redefine lists to help me understand.
-a = float(positives)
-b = float(plusminus)
-c = float(minusplus)
-d = float(negatives)
-e = float(doublepositives)
-f = float(doublenegatives)
+a = positives
+b = plusminus
+c = minusplus
+d = negatives
+e = doublepositives
+f = doublenegatives
 
 # This is for all ways to add two terms together (+dy,+dx [+dz] term): positives.
 for rows in range(size[0]):
@@ -208,7 +208,7 @@ for rows in range(size[0]):
     for cols in range(size[1]):
         print(cols)
         for items in range(size[0]):
-            if items < cols:
+            if items > cols:
                 raw_data[rows,cols] = raw_data[rows,cols] - differential
                 raw_data[rows,items] = raw_data[rows,items] + differential
                 data = np.column_stack((labels,raw_data))
@@ -223,7 +223,7 @@ for rows in range(size[0]):
     for cols in range(size[1]):
         print(cols)
         for items in range(size[0]):
-            if items < cols:
+            if items > cols:
                 raw_data[rows,cols] = raw_data[rows,cols] + differential
                 raw_data[rows,items] = raw_data[rows,items] - differential
                 data = np.column_stack((labels,raw_data))
