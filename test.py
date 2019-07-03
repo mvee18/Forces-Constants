@@ -1,12 +1,10 @@
-f = open('geom.xyz', 'r')
+f = open('reference.out', 'r')
 lines = f.readlines()
 
-test = []
-
 for line in lines:
-    if "O" in line:
+    if "CCSD(T)-F12/cc-pVTZ-F12//CCSD(T)-F12/cc-pVTZ-F12 energy" in line:
         line = line.split()
         print(line)
-        test.append(line[2])
+        reference = line[2]
 
-print(test)
+print(reference)
