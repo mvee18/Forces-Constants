@@ -23,7 +23,7 @@ yyy = yy.readlines()
 for line in yyy:
     if "CCSD(T)-F12/cc-pVTZ-F12//CCSD(T)-F12/cc-pVTZ-F12 energy" in line:
         line = line.split()
-        reference = line[2]
+        reference = float(line[2])
 
 def gen_com():
     temp = open('tmp.txt', 'r')
@@ -49,7 +49,6 @@ def save_and_gen():
     gen_com()
 
 # First derivatives.
-
 def first_derivative():
     for i in range(len(positives)):
         first_energy = ((float(positives[i]) - float(negatives[i]))/(2*differential))
@@ -171,12 +170,12 @@ negatives.clear()
 # Most significantly, this prevents double counting.
 
 # Redefine lists to help me understand.
-a = positives
-b = plusminus
-c = minusplus
-d = negatives
-e = doublepositives
-f = doublenegatives
+a = float(positives)
+b = float(plusminus)
+c = float(minusplus)
+d = float(negatives)
+e = float(doublepositives)
+f = float(doublenegatives)
 
 # This is for all ways to add two terms together (+dy,+dx [+dz] term): positives.
 for rows in range(size[0]):
