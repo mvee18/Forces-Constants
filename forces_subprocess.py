@@ -17,6 +17,14 @@ input_list = []
 for i in range(num_of_jobs):
     input_list.append(i)
 
+# We need the reference energy.
+yy = open("reference.out", 'r')
+yyy = yy.readlines()
+for line in yyy:
+    if "CCSD(T)-F12/cc-pVTZ-F12//CCSD(T)-F12/cc-pVTZ-F12 energy" in line:
+        line = line.split()
+        reference = line[2]
+
 def gen_com():
     temp = open('tmp.txt', 'r')
     f = open("input.com", 'w+')
