@@ -65,13 +65,13 @@ def first_derivative():
 # Second Derivatives for double displacements.
 def second_derivative_a():
     for i in range(len(e)):
-        second_energy = (e[i]-reference+f[i])/((differential*2)**2)
+        second_energy = (e[i] - 2*reference + f[i]) / ((differential*2)**2)
         print(second_energy)
 
 # More complicated second derivatives:
 def second_derivative_b():
     for i in range(len(a)):
-        second_energy_b = (a[i]-b[i]-c[i]+d[i])/(4*(differential)**2)
+        second_energy_b = (a[i] - b[i] - c[i] + d[i])/(4*(differential**2))
         print(second_energy_b)
 
 positives = []
@@ -250,6 +250,13 @@ for rows in range(size[0]):
                 raw_data[rows,items] = reset[rows,items]
 
 # To calculate the second derivative, some weird stuff has got to be figured out.
+a = [float(i) for i in a]
+b = [float(i) for i in b]
+c = [float(i) for i in c]
+d = [float(i) for i in d]
+e = [float(i) for i in e]
+f = [float(i) for i in f]
+reference = float(reference)
 
 second_derivative_a()
 second_derivative_b()
