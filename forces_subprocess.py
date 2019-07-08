@@ -229,6 +229,16 @@ for rows in range(size[0]):
                 print(data)
                 raw_data[rows,cols] = reset[rows,cols]
                 raw_data[rows,items] = reset[rows,items]
+        for i in range(size[0]):
+            if i > rows:
+                print(i)
+                raw_data[rows,cols] = raw_data[rows,cols] - differential
+                raw_data[i,cols] = raw_data[i,cols] + differential
+                data = np.column_stack((labels,raw_data))
+                print(data)
+                raw_data[rows,cols] = reset[rows,cols]
+                raw_data[i,cols] = reset[i,cols]
+
 #These are the (x,-y),(x,-z),(y,-z) terms.
 for rows in range(size[0]):
     print(rows)
@@ -244,6 +254,16 @@ for rows in range(size[0]):
                 print(data)
                 raw_data[rows,cols] = reset[rows,cols]
                 raw_data[rows,items] = reset[rows,items]
+        for i in range(size[0]):
+            if i > rows:
+                print(i)
+                raw_data[rows,cols] = raw_data[rows,cols] + differential
+                raw_data[i,cols] = raw_data[i,cols] - differential
+                data = np.column_stack((labels,raw_data))
+                print(data)
+                raw_data[rows,cols] = reset[rows,cols]
+                raw_data[i,cols] = reset[i,cols]
+
 #These are the (-x,-x,): negatives.
 for rows in range(size[0]):
     print(rows)
@@ -266,6 +286,15 @@ for rows in range(size[0]):
                 print(data)
                 raw_data[rows,cols] = reset[rows,cols]
                 raw_data[rows,items] = reset[rows,items]
+        for i in range(size[0]):
+            if i > rows:
+                print(i)
+                raw_data[rows,cols] = raw_data[rows,cols] - differential
+                raw_data[i,cols] = raw_data[i,cols] - differential
+                data = np.column_stack((labels,raw_data))
+                print(data)
+                raw_data[rows,cols] = reset[rows,cols]
+                raw_data[i,cols] = reset[i,cols]
 
 # To calculate the second derivative, some weird stuff has got to be figured out.
 a = [float(i) for i in a]
