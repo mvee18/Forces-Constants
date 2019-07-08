@@ -134,7 +134,7 @@ def extract_energy(posorneg):
 def sub_job():
     subprocess.call("mpiexec molpro.exe input.com", shell=True)
     return
-
+"""
 #After header, we will have to do the submission.
 for rows in range(size[0]):
     for cols in range(size[1]):
@@ -155,6 +155,7 @@ for i in range(size[0]):
         raw_data[rows,cols] = reset[rows,cols]
 
 first_derivative()
+"""
 
 print(positives)
 print(negatives)
@@ -180,28 +181,39 @@ e = doublepositives
 f = doublenegatives
 
 # This is for all ways to add two terms together (+dy,+dx [+dz] term): positives.
+
 for rows in range(size[0]):
     print(rows)
     for cols in range(size[1]):
         print(cols)
-        for items in range(size[0]):
+        for items in range(size[1]):
             if items == cols:
                 raw_data[rows,cols] = raw_data[rows,cols] + differential*2
                 data = np.column_stack((labels,raw_data))
-                save_and_gen()
-                extract_energy("doublepositives")
+                # save_and_gen()
+                # extract_energy("doublepositives")
                 print(data)
                 raw_data[rows,cols] = reset[rows,cols]
             elif items > cols:
                 raw_data[rows,cols] = raw_data[rows,cols] + differential
                 raw_data[rows,items] = raw_data[rows,items] + differential
                 data = np.column_stack((labels,raw_data))
-                save_and_gen()
-                extract_energy("positives")
+                # save_and_gen()
+                # extract_energy("positives")
                 print(data)
                 raw_data[rows,cols] = reset[rows,cols]
                 raw_data[rows,items] = reset[rows,items]
+        for i in range(size[0]):
+            if i > rows:
+                print(i)
+                raw_data[rows,cols] = raw_data[rows,cols] + differential
+                raw_data[i,cols] = raw_data[i,cols] + differential
+                data = np.column_stack((labels,raw_data))
+                print(data)
+                raw_data[rows,cols] = reset[rows,cols]
+                raw_data[i,cols] = reset[i,cols]
 
+"""
 # These are the (-x,y),(-x,z),(-y,z) terms.
 for rows in range(size[0]):
     print(rows)
@@ -266,7 +278,7 @@ reference = float(reference)
 
 second_derivative_a()
 second_derivative_b()
-
+"""
 print(a)
 print(b)
 print(c)
