@@ -91,6 +91,7 @@ def sub_job():
 threads = []
 def threads():
     t = Thread(target=sub_job)
+    threads.append(t)
 
 def run_jobs():
     for x in threads:
