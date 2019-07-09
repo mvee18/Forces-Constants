@@ -2,6 +2,7 @@ import os
 import numpy as np
 import threading
 import subprocess
+from threading import Thread
 
 differential = 0.005
 nn = 1
@@ -60,6 +61,7 @@ def gen_com(name):
     print(nn)
 
 def gen_pbs():
+    print(nn)
     f = open('input{0}.pbs'.format(nn), 'w+')
     f.write("#!/bin/sh\n")
     f.write("#PBS -N job{0}\n".format(nn))
@@ -79,19 +81,20 @@ def gen_pbs():
     f.write("mkdir -p $TMPDIR\n\n")
 
     f.write("date\n")
-    f.write("mpiexec molpro.exe input{}.com input{}.out\n".format(nn,nn))
+    f.write("mpiexec molpro.exe input{0}.com\n".format(nn,nn))
     f.write("date\n\n")
 
     f.write("rm -rf $TMPDIR")
 
 def sub_job():
-    subprocess.call(args)
-    return
+    print(nn)
+    subprocess.call("mpiexec molpro.exe input1.com".format(nn),shell=True)
 
 threadslist = []
+"""
 def threads():
-    t = Thread(target=sub_job, args=("mpiexec molpro.exe input{0}.com").format(nn), shell=True)
-    threadslist.append(t)
+    t1 = Thread(target=sub_job)
+    threadslist.append(t1)
 
 def run_jobs():
     print(threadslist)
@@ -99,7 +102,7 @@ def run_jobs():
         x.start()
     for x in threadslist:
         x.join()
-
+"""
 positives = []
 negatives = []
 minusplus = []
@@ -196,7 +199,6 @@ for rows in range(size[0]):
         print(pos_dif)
         gen_com("tmp.txt")
         gen_pbs()
-        threads()
         nn += 1
         # extract_energy("positives")
         raw_data[rows,cols] = reset[rows,cols]
@@ -207,14 +209,14 @@ for rows in range(size[0]):
         print(neg_dif)
         gen_com("tmp2.txt")
         gen_pbs()
-        threads()
         nn += 1
         # extract_energy("negatives")
         raw_data[rows,cols] = reset[rows,cols]
 nn -= 1
+t1 = Thread(target=sub_job)
+t1.start()
+t1.join
 
-
-run_jobs()
 """
 for i in range(size[0]):
     for cols in range(size[1]):
