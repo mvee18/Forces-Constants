@@ -4,6 +4,7 @@ import threading
 import subprocess
 
 differential = 0.005
+nn = 1
 
 reset = np.genfromtxt('geom.xyz', skip_header=1, usecols=(1,2,3))
 raw_data = np.genfromtxt('geom.xyz', skip_header=1, usecols=(1,2,3))
@@ -32,7 +33,14 @@ def save_and_gen():
 def gen_com(name):
     filename = name
     temp = open(filename, 'r')
-    f = open("input.com", 'w+')
+    if filename == "tmp.txt":
+        f = open("input{0}.com".format(nn), 'w+')
+    elif filename == "tmp2.txt":
+        f = open("input{0}.com".format(nn), 'w+')
+    elif filename == "tmp3.txt":
+        f = open("input{0}.com".format(nn), 'w+')
+    elif filename == "tmp4.txt":
+        f = open("input{0}.com".format(nn), 'w+')
     f.write("memory,%d,m\n" %memory_list[0])
     f.write("\nnocompress;\n")
     f.write("geomtyp=xyz\n")
@@ -48,6 +56,8 @@ def gen_com(name):
     f.write("{CCSD(T)-F12}")
     f.close()
     temp.close()
+    subprocess.call("rm tmp*.txt", shell=True)
+    print(nn)
 
 def sub_job():
     subprocess.call("mpiexec molpro.exe input.com", shell=True)
@@ -144,15 +154,17 @@ for rows in range(size[0]):
         np.savetxt("tmp.txt", pos_dif, delimiter=" ", fmt='%s')
         print(pos_dif)
         gen_com("tmp.txt")
-        extract_energy("positives")
+        nn += 1
+        # extract_energy("positives")
         raw_data[rows,cols] = reset[rows,cols]
 
         raw_data[rows,cols] = raw_data[rows,cols] - differential
         neg_dif = np.column_stack((labels,raw_data))
         np.savetxt("tmp2.txt", neg_dif, delimiter=" ", fmt='%s')
-        print("tmp2.txt")
-        gen_com()
-        extract_energy("negatives")
+        print(neg_dif)
+        gen_com("tmp2.txt")
+        nn += 1
+        # extract_energy("negatives")
         raw_data[rows,cols] = reset[rows,cols]
 
 """
