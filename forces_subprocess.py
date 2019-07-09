@@ -25,8 +25,13 @@ for line in yyy:
         line = line.split()
         reference = float(line[2])
 
-def gen_com():
-    temp = open('tmp.txt', 'r')
+def save_and_gen():
+    np.savetxt("tmp.txt", data, delimiter=" ", fmt='%s')
+    gen_com()
+
+def gen_com(name):
+    filename = name
+    temp = open(filename, 'r')
     f = open("input.com", 'w+')
     f.write("memory,%d,m\n" %memory_list[0])
     f.write("\nnocompress;\n")
@@ -44,35 +49,9 @@ def gen_com():
     f.close()
     temp.close()
 
-def save_and_gen():
-    np.savetxt("tmp.txt", data, delimiter=" ", fmt='%s')
-    gen_com()
-
-# First derivatives.
-def first_derivative():
-    for i in range(len(positives)):
-        first_energy = ((float(positives[i]) - float(negatives[i]))/(2*differential))
-        if i % 3 == 0:
-            print("d/dx:")
-            print(first_energy)
-        elif i % 3 == 1:
-            print("d/dy:")
-            print(first_energy)
-        elif i % 3 == 2:
-            print("d/dz")
-            print(first_energy)
-
-# Second Derivatives for double displacements.
-def second_derivative_a():
-    for i in range(len(e)):
-        second_energy = (e[i] - 2*reference + f[i]) / ((differential*2)**2)
-        print(second_energy)
-
-# More complicated second derivatives:
-def second_derivative_b():
-    for i in range(len(a)):
-        second_energy_b = (a[i] - b[i] - c[i] + d[i])/(4*(differential**2))
-        print(second_energy_b)
+def sub_job():
+    subprocess.call("mpiexec molpro.exe input.com", shell=True)
+    return
 
 positives = []
 negatives = []
@@ -131,30 +110,63 @@ def extract_energy(posorneg):
                 line = line.split()
                 doublenegatives.append(line[3])
 
-def sub_job():
-    subprocess.call("mpiexec molpro.exe input.com", shell=True)
-    return
-"""
-#After header, we will have to do the submission.
+# First derivatives.
+def first_derivative():
+    for i in range(len(positives)):
+        first_energy = ((float(positives[i]) - float(negatives[i]))/(2*differential))
+        if i % 3 == 0:
+            print("d/dx:")
+            print(first_energy)
+        elif i % 3 == 1:
+            print("d/dy:")
+            print(first_energy)
+        elif i % 3 == 2:
+            print("d/dz")
+            print(first_energy)
+
+# Second Derivatives for double displacements.
+def second_derivative_a():
+    for i in range(len(e)):
+        second_energy = (e[i] - 2*reference + f[i]) / ((differential*2)**2)
+        print(second_energy)
+
+# More complicated second derivatives:
+def second_derivative_b():
+    for i in range(len(a)):
+        second_energy_b = (a[i] - b[i] - c[i] + d[i])/(4*(differential**2))
+        print(second_energy_b)
+
+# FIRST DISP GENERATION
 for rows in range(size[0]):
     for cols in range(size[1]):
         raw_data[rows,cols] = raw_data[rows,cols] + differential
         pos_dif = np.column_stack((labels,raw_data))
         np.savetxt("tmp.txt", pos_dif, delimiter=" ", fmt='%s')
-        gen_com()
+        print(pos_dif)
+        gen_com("tmp.txt")
         extract_energy("positives")
         raw_data[rows,cols] = reset[rows,cols]
 
+        raw_data[rows,cols] = raw_data[rows,cols] - differential
+        neg_dif = np.column_stack((labels,raw_data))
+        np.savetxt("tmp2.txt", neg_dif, delimiter=" ", fmt='%s')
+        print("tmp2.txt")
+        gen_com()
+        extract_energy("negatives")
+        raw_data[rows,cols] = reset[rows,cols]
+
+"""
 for i in range(size[0]):
     for cols in range(size[1]):
         raw_data[rows,cols] = raw_data[rows,cols] - differential
         neg_dif = np.column_stack((labels,raw_data))
         np.savetxt("tmp.txt", neg_dif, delimiter=" ", fmt='%s')
-        gen_com()
-        extract_energy("negatives")
+#        gen_com()
+#        extract_energy("negatives")
         raw_data[rows,cols] = reset[rows,cols]
 
-first_derivative()
+
+# first_derivative()
 """
 
 print(positives)
@@ -180,7 +192,8 @@ d = negatives
 e = doublepositives
 f = doublenegatives
 
-# This is for all ways to add two terms together (+dy,+dx [+dz] term): positives.
+# This is for all ways to add two terms together.
+
 
 for rows in range(size[0]):
     print(rows)
@@ -188,13 +201,23 @@ for rows in range(size[0]):
         print(cols)
         for items in range(size[1]):
             if items == cols:
+# This is the +[xx,yy,zz] term.
                 raw_data[rows,cols] = raw_data[rows,cols] + differential*2
                 data = np.column_stack((labels,raw_data))
                 # save_and_gen()
                 # extract_energy("doublepositives")
                 print(data)
                 raw_data[rows,cols] = reset[rows,cols]
+# This is the -[xx,yy,zz] term.
+                raw_data[rows,cols] = raw_data[rows,cols] - differential*2
+                data = np.column_stack((labels,raw_data))
+                # save_and_gen()
+                # extract_energy("doublenegatives")
+                print(data)
+                raw_data[rows,cols] = reset[rows,cols]
+
             elif items > cols:
+# These are the ways to arrange two terms together: positives.
                 raw_data[rows,cols] = raw_data[rows,cols] + differential
                 raw_data[rows,items] = raw_data[rows,items] + differential
                 data = np.column_stack((labels,raw_data))
@@ -203,8 +226,51 @@ for rows in range(size[0]):
                 print(data)
                 raw_data[rows,cols] = reset[rows,cols]
                 raw_data[rows,items] = reset[rows,items]
+# These are the ways to arrange the -,-: negatives.
+                raw_data[rows,cols] = raw_data[rows,cols] - differential
+                raw_data[rows,items] = raw_data[rows,items] - differential
+                data = np.column_stack((labels,raw_data))
+                #save_and_gen()
+                #extract_energy("negatives")
+                print(data)
+                raw_data[rows,cols] = reset[rows,cols]
+                raw_data[rows,items] = reset[rows,items]
+# -,+: minusplus
+                raw_data[rows,cols] = raw_data[rows,cols] - differential
+                raw_data[rows,items] = raw_data[rows,items] + differential
+                data = np.column_stack((labels,raw_data))
+                #save_and_gen()
+                #extract_energy("minusplus")
+                print(data)
+                raw_data[rows,cols] = reset[rows,cols]
+                raw_data[rows,items] = reset[rows,items]
+#+,-: plusminus
+                raw_data[rows,cols] = raw_data[rows,cols] + differential
+                raw_data[rows,items] = raw_data[rows,items] - differential
+                data = np.column_stack((labels,raw_data))
+                #save_and_gen()
+                #extract_energy("plusminus")
+                print(data)
+                raw_data[rows,cols] = reset[rows,cols]
+                raw_data[rows,items] = reset[rows,items]
+#Vertical distribution of displacements.
         for i in range(size[0]):
-            if i > rows:
+            if i == rows:
+# X1 term.
+                raw_data[rows,cols] = raw_data[rows,cols] + differential *2
+                data = np.column_stack((labels,raw_data))
+                print(data)
+                raw_data[rows,cols] = reset[rows,cols]
+                raw_data[i,cols] = reset[i,cols]
+# -X1 term.
+                raw_data[rows,cols] = raw_data[rows,cols] - differential * 2
+                data = np.column_stack((labels,raw_data))
+                print(data)
+                raw_data[rows,cols] = reset[rows,cols]
+                raw_data[i,cols] = reset[i,cols]
+
+            elif i > rows:
+# X1 and X2...
                 print(i)
                 raw_data[rows,cols] = raw_data[rows,cols] + differential
                 raw_data[i,cols] = raw_data[i,cols] + differential
@@ -212,6 +278,28 @@ for rows in range(size[0]):
                 print(data)
                 raw_data[rows,cols] = reset[rows,cols]
                 raw_data[i,cols] = reset[i,cols]
+#-X1 and -X2
+                raw_data[rows,cols] = raw_data[rows,cols] - differential
+                raw_data[i,cols] = raw_data[i,cols] - differential
+                data = np.column_stack((labels,raw_data))
+                print(data)
+                raw_data[rows,cols] = reset[rows,cols]
+                raw_data[i,cols] = reset[i,cols]
+# -X1 and X2
+                raw_data[rows,cols] = raw_data[rows,cols] - differential
+                raw_data[i,cols] = raw_data[i,cols] + differential
+                data = np.column_stack((labels,raw_data))
+                print(data)
+                raw_data[rows,cols] = reset[rows,cols]
+                raw_data[i,cols] = reset[i,cols]
+# X1 and -X2.
+                raw_data[rows,cols] = raw_data[rows,cols] + differential
+                raw_data[i,cols] = raw_data[i,cols] - differential
+                data = np.column_stack((labels,raw_data))
+                print(data)
+                raw_data[rows,cols] = reset[rows,cols]
+                raw_data[i,cols] = reset[i,cols]
+
 
 """
 # These are the (-x,y),(-x,z),(-y,z) terms.
