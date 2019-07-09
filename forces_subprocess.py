@@ -59,8 +59,34 @@ def gen_com(name):
     subprocess.call("rm tmp*.txt", shell=True)
     print(nn)
 
+def gen_pbs():
+    f = open('input{0}.pbs'.format(nn), 'w+')
+    f.write("#!/bin/sh\n")
+    f.write("#PBS -N job{0}\n".format(nn))
+    f.write("#PBS -S /bin/bash\n")
+    f.write("#PBS -j oe\n")
+    f.write("#PBS -W umask=022\n")
+    f.write("#PBS -l walltime=00:30:00\n")
+    f.write("#PBS -l ncpus=1\n")
+    f.write("#PBS -l mem=50mb\n\n")
+    f.write("module load intel\n")
+    f.write("module load mpt\n")
+    f.write("export PATH=/ptmp/bwhopkin/molpro_mpt/2012/molprop_2012_1_Linux_x86_64_i8/bin:$PATH\n\n")
+
+    f.write("export WORKDIR=$PBS_O_WORKDIR\n")
+    f.write("export TMPDIR=/tmp/$USER/$PBS_JOBID\n")
+    f.write("cd $WORKDIR\n")
+    f.write("mkdir -p $TMPDIR\n\n")
+
+    f.write("date")
+    f.write("mpiexec molpro.exe input{}.com input{}.out\n".format(nn,nn))
+    f.write("date\n\n")
+
+    f.write("rm -rf $TMPDIR")
+
 def sub_job():
-    subprocess.call("mpiexec molpro.exe input.com", shell=True)
+    subprocess.Popen("mpiexec molpro.exe input{0}.com".format(nn), shell=True)
+    subprocess.Popen("mpiexec molpro.exe input{0}.com".format(nn), shell=True)
     return
 
 positives = []
@@ -69,6 +95,9 @@ minusplus = []
 plusminus = []
 doublepositives = []
 doublenegatives = []
+
+"""
+Probably will have to be separate -- in a different progran.
 
 def extract_energy(posorneg):
     if posorneg == "positives":
@@ -119,6 +148,7 @@ def extract_energy(posorneg):
             if "!CCSD(T)-F12b total energy" in line:
                 line = line.split()
                 doublenegatives.append(line[3])
+"""
 
 # First derivatives.
 def first_derivative():
@@ -154,6 +184,7 @@ for rows in range(size[0]):
         np.savetxt("tmp.txt", pos_dif, delimiter=" ", fmt='%s')
         print(pos_dif)
         gen_com("tmp.txt")
+        gen_pbs()
         nn += 1
         # extract_energy("positives")
         raw_data[rows,cols] = reset[rows,cols]
@@ -163,6 +194,7 @@ for rows in range(size[0]):
         np.savetxt("tmp2.txt", neg_dif, delimiter=" ", fmt='%s')
         print(neg_dif)
         gen_com("tmp2.txt")
+        gen_pbs()
         nn += 1
         # extract_energy("negatives")
         raw_data[rows,cols] = reset[rows,cols]
