@@ -85,18 +85,19 @@ def gen_pbs():
     f.write("rm -rf $TMPDIR")
 
 def sub_job():
-    subprocess.call("mpiexec molpro.exe input{0}.com".format(nn), shell=True)
+    subprocess.call(args)
     return
 
-threads = []
+threadslist = []
 def threads():
-    t = Thread(target=sub_job)
-    threads.append(t)
+    t = Thread(target=sub_job, args=("mpiexec molpro.exe input{0}.com").format(nn), shell=True)
+    threadslist.append(t)
 
 def run_jobs():
-    for x in threads:
+    print(threadslist)
+    for x in threadslist:
         x.start()
-    for x in threads:
+    for x in threadslist:
         x.join()
 
 positives = []
@@ -210,7 +211,7 @@ for rows in range(size[0]):
         nn += 1
         # extract_energy("negatives")
         raw_data[rows,cols] = reset[rows,cols]
-
+nn -= 1
 run_jobs()
 """
 for i in range(size[0]):
