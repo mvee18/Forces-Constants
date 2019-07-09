@@ -85,7 +85,7 @@ def gen_pbs():
     f.write("rm -rf $TMPDIR")
 
 def sub_job():
-    subprocess.Popen("mpiexec molpro.exe input{0}.com".format(nn), shell=True)
+    subprocess.call("mpiexec molpro.exe input{0}.com".format(nn), shell=True)
     return
 
 threads = []
