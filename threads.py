@@ -3,6 +3,7 @@ import numpy as np
 import threading
 import subprocess
 from threading import Thread
+import time
 
 differential = 0.005
 nn = 1
@@ -92,14 +93,17 @@ def sub_job(args):
 threadslist = []
 
 def threads():
-    threadslist.append(Thread(target=sub_job, args=nn))
+    thread = Thread(target=sub_job, args=(nn,))
+    threadslist.append(thread)
 
-#def run_jobs():
-#    print(threadslist)
-#    for x in threadslist:
-#        x.start()
-#    for x in threadslist:
-#        x.join()
+def run_jobs():
+    print(threadslist)
+    for x in threadslist:
+        x.start()
+        time.sleep(1)
+    for x in threadslist:
+        x.join()
+        time.sleep(1)
 
 positives = []
 negatives = []
@@ -143,6 +147,7 @@ for rows in range(size[0]):
         print(pos_dif)
         gen_com("tmp.txt")
         gen_pbs()
+        threads()
         nn += 1
         # extract_energy("positives")
         raw_data[rows,cols] = reset[rows,cols]
@@ -153,15 +158,13 @@ for rows in range(size[0]):
         print(neg_dif)
         gen_com("tmp2.txt")
         gen_pbs()
+        threads()
         nn += 1
         # extract_energy("negatives")
         raw_data[rows,cols] = reset[rows,cols]
 nn -= 1
-
-t1 = Thread(target=sub_job)
-t1.start()
-t1.join()
-
+print(threadslist)
+run_jobs()
 """
 for i in range(size[0]):
     for cols in range(size[1]):
