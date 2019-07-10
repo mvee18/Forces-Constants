@@ -332,7 +332,6 @@ for rows in range(size[0]):
                 subprocess.call("rm input*.pbs*", shell=True)
                 subprocess.call("rm input*.out*", shell=True)
                 subprocess.call("rm input*.xml*", shell=True)
-                print(data)
                 raw_data[rows,cols] = reset[rows,cols]
 
             elif items > cols:
@@ -358,7 +357,6 @@ for rows in range(size[0]):
                 gen_pbs("pbs2")
                 threads(2)
                 nn+=1
-                print(data)
                 raw_data[rows,cols] = reset[rows,cols]
                 raw_data[rows,items] = reset[rows,items]
 # -,+: minusplus
@@ -371,7 +369,6 @@ for rows in range(size[0]):
                 gen_pbs("pbs3")
                 threads(3)
                 nn+=1
-                print(data)
                 raw_data[rows,cols] = reset[rows,cols]
                 raw_data[rows,items] = reset[rows,items]
 #+,-: plusminus
