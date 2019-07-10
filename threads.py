@@ -233,6 +233,7 @@ for rows in range(size[0]):
         first_derivative()
         subprocess.call("rm input*.com*", shell=True)
         subprocess.call("rm input*.pbs*", shell=True)
+        subprocess.call("rm input*.out*", shell=True)
         raw_data[rows,cols] = reset[rows,cols]
 
 print(threadslist)
