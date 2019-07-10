@@ -16,7 +16,8 @@ export TMPDIR=/tmp/$USER/$PBS_JOBID
 cd $WORKDIR
 mkdir -p $TMPDIR
 
-datempiexec molpro.exe input16.com input16.out
+date
+mpiexec molpro.exe input16.com
 date
 
 rm -rf $TMPDIR

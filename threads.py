@@ -36,13 +36,13 @@ def gen_com(name):
     filename = name
     temp = open(filename, 'r')
     if filename == "tmp.txt":
-        f = open("input{0}.com".format(nn), 'w+')
+        f = open("input1.com", 'w+')
     elif filename == "tmp2.txt":
-        f = open("input{0}.com".format(nn), 'w+')
+        f = open("input2.com", 'w+')
     elif filename == "tmp3.txt":
-        f = open("input{0}.com".format(nn), 'w+')
+        f = open("input3.com", 'w+')
     elif filename == "tmp4.txt":
-        f = open("input{0}.com".format(nn), 'w+')
+        f = open("input4.com", 'w+')
     f.write("memory,%d,m\n" %memory_list[0])
     f.write("\nnocompress;\n")
     f.write("geomtyp=xyz\n")
@@ -59,11 +59,17 @@ def gen_com(name):
     f.close()
     temp.close()
     subprocess.call("rm tmp*.txt", shell=True)
-    print(nn)
 
-def gen_pbs():
-    print(nn)
-    f = open('input{0}.pbs'.format(nn), 'w+')
+def gen_pbs(name):
+    filename = name
+    if filename == "pbs1":
+        f = open("input1.pbs", 'w+')
+    elif filename == "pbs2":
+        f = open("input2.pbs", 'w+')
+    elif filename == "pbs3":
+        f = open("input3.pbs", 'w+')
+    elif filename == "pbs4":
+        f = open("input4.pbs", 'w+')
     f.write("#!/bin/sh\n")
     f.write("#PBS -N job{0}\n".format(nn))
     f.write("#PBS -S /bin/bash\n")
@@ -82,7 +88,14 @@ def gen_pbs():
     f.write("mkdir -p $TMPDIR\n\n")
 
     f.write("date\n")
-    f.write("mpiexec molpro.exe input{0}.com\n".format(nn,nn))
+    if filename == "pbs1":
+        f.write("mpiexec molpro.exe input1.com\n")
+    elif filename == "pbs2":
+        f.write("mpiexec molpro.exe input2.com\n")
+    elif filename == "pbs3":
+        f.write("mpiexec molpro.exe input3.com\n")
+    elif filename == "pbs4":
+        f.write("mpiexec molpro.exe input4.com\n")
     f.write("date\n\n")
 
     f.write("rm -rf $TMPDIR")
@@ -92,8 +105,8 @@ def sub_job(args):
 
 threadslist = []
 
-def threads():
-    thread = Thread(target=sub_job, args=(nn,))
+def threads(number):
+    thread = Thread(target=sub_job, args=(number,))
     threadslist.append(thread)
 
 def run_jobs():
@@ -104,6 +117,7 @@ def run_jobs():
     for x in threadslist:
         x.join()
         time.sleep(1)
+    threadslist.clear()
 
 positives = []
 negatives = []
@@ -147,7 +161,7 @@ for rows in range(size[0]):
         print(pos_dif)
         gen_com("tmp.txt")
         gen_pbs()
-        threads()
+        threads(1)
         nn += 1
         # extract_energy("positives")
         raw_data[rows,cols] = reset[rows,cols]
@@ -158,13 +172,14 @@ for rows in range(size[0]):
         print(neg_dif)
         gen_com("tmp2.txt")
         gen_pbs()
-        threads()
+        threads(2)
         nn += 1
+        run_jobs()
         # extract_energy("negatives")
         raw_data[rows,cols] = reset[rows,cols]
-nn -= 1
+
 print(threadslist)
-run_jobs()
+
 """
 for i in range(size[0]):
     for cols in range(size[1]):
@@ -412,6 +427,10 @@ print(c)
 print(d)
 print(e)
 print(f)
+
+import psutil
+process = psutil.Process(os.getpid())
+print(process.memory_info()[0])
 
 """
 Probably will have to be separate -- in a different progran.
