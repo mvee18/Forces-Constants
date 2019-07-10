@@ -119,6 +119,56 @@ def run_jobs():
         time.sleep(1)
     threadslist.clear()
 
+def extract_energy(numberofinput):
+    if numberofinput == 1:
+        zz = open("input1.out", 'r')
+        zzz = zz.readlines()
+        for line in zzz:
+            if "!CCSD(T)-F12b total energy" in line:
+                line = line.split()
+                positives.append(line[3])
+                zz.close()
+    elif numberofinput == 2:
+        zz = open("input2.out", 'r')
+        zzz = zz.readlines()
+        for line in zzz:
+            if "!CCSD(T)-F12b total energy" in line:
+                line = line.split()
+                negatives.append(line[3])
+                zz.close()
+    elif numberofinput == 3:
+        zz = open("input3.out", 'r')
+        zzz = zz.readlines()
+        for line in zzz:
+            if "!CCSD(T)-F12b total energy" in line:
+                line = line.split()
+                minusplus.append(line[3])
+                zz.close()
+    elif numberofinput == 4:
+        zz = open("input4.out", 'r')
+        zzz = zz.readlines()
+        for line in zzz:
+            if "!CCSD(T)-F12b total energy" in line:
+                line = line.split()
+                plusminus.append(line[3])
+                zz.close()
+#    elif posorneg == "doublepositives":
+#        sub_job()
+#        zz = open("input.out", 'r')
+#        zzz = zz.readlines()
+#        for line in zzz:
+#            if "!CCSD(T)-F12b total energy" in line:
+#                line = line.split()
+#                doublepositives.append(line[3])
+#    elif posorneg == "doublenegatives":
+#        sub_job()
+#        zz = open("input.out", 'r')
+#        zzz = zz.readlines()
+#        for line in zzz:
+#            if "!CCSD(T)-F12b total energy" in line:
+#                line = line.split()
+#                doublenegatives.append(line[3])
+
 positives = []
 negatives = []
 minusplus = []
@@ -130,15 +180,18 @@ doublenegatives = []
 def first_derivative():
     for i in range(len(positives)):
         first_energy = ((float(positives[i]) - float(negatives[i]))/(2*differential))
-        if i % 3 == 0:
-            print("d/dx:")
-            print(first_energy)
-        elif i % 3 == 1:
-            print("d/dy:")
-            print(first_energy)
-        elif i % 3 == 2:
-            print("d/dz")
-            print(first_energy)
+        positives.clear()
+        negatives.clear()
+        print(first_energy)
+        #if i % 3 == 0:
+        #    print("d/dx:")
+        #    print(first_energy)
+        #elif i % 3 == 1:
+        #    print("d/dy:")
+        #    print(first_energy)
+        #elif i % 3 == 2:
+        #    print("d/dz")
+        #    print(first_energy)
 
 # Second Derivatives for double displacements.
 def second_derivative_a():
@@ -160,10 +213,9 @@ for rows in range(size[0]):
         np.savetxt("tmp.txt", pos_dif, delimiter=" ", fmt='%s')
         print(pos_dif)
         gen_com("tmp.txt")
-        gen_pbs()
+        gen_pbs("pbs1")
         threads(1)
         nn += 1
-        # extract_energy("positives")
         raw_data[rows,cols] = reset[rows,cols]
 
         raw_data[rows,cols] = raw_data[rows,cols] - differential
@@ -171,11 +223,16 @@ for rows in range(size[0]):
         np.savetxt("tmp2.txt", neg_dif, delimiter=" ", fmt='%s')
         print(neg_dif)
         gen_com("tmp2.txt")
-        gen_pbs()
+        gen_pbs("pbs2")
         threads(2)
         nn += 1
         run_jobs()
-        # extract_energy("negatives")
+# you can clean this up by combining the arguments.
+        extract_energy(1)
+        extract_energy(2)
+        first_derivative()
+        subprocess.call("rm input*.com*", shell=True)
+        subprocess.call("rm input*.pbs*", shell=True)
         raw_data[rows,cols] = reset[rows,cols]
 
 print(threadslist)
@@ -431,57 +488,3 @@ print(f)
 import psutil
 process = psutil.Process(os.getpid())
 print(process.memory_info()[0])
-
-"""
-Probably will have to be separate -- in a different progran.
-
-def extract_energy(posorneg):
-    if posorneg == "positives":
-        sub_job()
-        zz = open("input.out", 'r')
-        zzz = zz.readlines()
-        for line in zzz:
-            if "!CCSD(T)-F12b total energy" in line:
-                line = line.split()
-                positives.append(line[3])
-    elif posorneg == "negatives":
-        sub_job()
-        zz = open("input.out", 'r')
-        zzz = zz.readlines()
-        for line in zzz:
-            if "!CCSD(T)-F12b total energy" in line:
-                line = line.split()
-                negatives.append(line[3])
-    elif posorneg == "minusplus":
-        sub_job()
-        zz = open("input.out", 'r')
-        zzz = zz.readlines()
-        for line in zzz:
-            if "!CCSD(T)-F12b total energy" in line:
-                line = line.split()
-                minusplus.append(line[3])
-    elif posorneg == "plusminus":
-        sub_job()
-        zz = open("input.out", 'r')
-        zzz = zz.readlines()
-        for line in zzz:
-            if "!CCSD(T)-F12b total energy" in line:
-                line = line.split()
-                plusminus.append(line[3])
-    elif posorneg == "doublepositives":
-        sub_job()
-        zz = open("input.out", 'r')
-        zzz = zz.readlines()
-        for line in zzz:
-            if "!CCSD(T)-F12b total energy" in line:
-                line = line.split()
-                doublepositives.append(line[3])
-    elif posorneg == "doublenegatives":
-        sub_job()
-        zz = open("input.out", 'r')
-        zzz = zz.readlines()
-        for line in zzz:
-            if "!CCSD(T)-F12b total energy" in line:
-                line = line.split()
-                doublenegatives.append(line[3])
-"""
