@@ -190,6 +190,7 @@ doublepositives = []
 doublenegatives = []
 
 # First derivatives.
+# Could speed this up by removing the iterator, since there is no longer more than one item in the list.
 def first_derivative():
     for i in range(len(positives)):
         first_energy = ((float(positives[i]) - float(negatives[i]))/(2*differential))
@@ -206,12 +207,17 @@ def first_derivative():
         #    print("d/dz")
         #    print(first_energy)
 
+second_energy_list_a = []
+second_energy_list_b = []
+
 # Second Derivatives for double displacements.
+# Could speed this up by removing the iterator, since there is no longer more than one item in the list.
 def second_derivative_a():
     for i in range(len(e)):
         second_energy = (float(e[i]) - 2*reference + float(f[i])) / ((differential*2)**2)
         e.clear()
         f.clear()
+        second_energy_list_a.append(second_energy)
         print(second_energy)
 
 # More complicated second derivatives:
@@ -222,6 +228,7 @@ def second_derivative_b():
         b.clear()
         c.clear()
         d.clear()
+        second_energy_list_b.append(second_energy)
         print(second_energy_b)
 
 # FIRST DISP GENERATION
@@ -490,102 +497,21 @@ for rows in range(size[0]):
                 raw_data[rows,cols] = reset[rows,cols]
                 raw_data[i,cols] = reset[i,cols]
 
+print(second_energy_list_a)
+print(second_energy_list_b)
 
-"""
-# These are the (-x,y),(-x,z),(-y,z) terms.
-for rows in range(size[0]):
-    print(rows)
-    for cols in range(size[1]):
-        print(cols)
-        for items in range(size[0]):
-            if items > cols:
-                raw_data[rows,cols] = raw_data[rows,cols] - differential
-                raw_data[rows,items] = raw_data[rows,items] + differential
-                data = np.column_stack((labels,raw_data))
-                save_and_gen()
-                extract_energy("minusplus")
-                print(data)
-                raw_data[rows,cols] = reset[rows,cols]
-                raw_data[rows,items] = reset[rows,items]
-        for i in range(size[0]):
-            if i > rows:
-                print(i)
-                raw_data[rows,cols] = raw_data[rows,cols] - differential
-                raw_data[i,cols] = raw_data[i,cols] + differential
-                data = np.column_stack((labels,raw_data))
-                print(data)
-                raw_data[rows,cols] = reset[rows,cols]
-                raw_data[i,cols] = reset[i,cols]
+second_energy_list_a = np.asarray(second_energy_list_a)
+second_energy_list_b = np.asarray(second_energy_list_b)
+second_energy_list_a = np.split(second_energy_list_a)
+second_energy_list_b = np.split(second_energy_list_b)
 
-#These are the (x,-y),(x,-z),(y,-z) terms.
-for rows in range(size[0]):
-    print(rows)
-    for cols in range(size[1]):
-        print(cols)
-        for items in range(size[0]):
-            if items > cols:
-                raw_data[rows,cols] = raw_data[rows,cols] + differential
-                raw_data[rows,items] = raw_data[rows,items] - differential
-                data = np.column_stack((labels,raw_data))
-                save_and_gen()
-                extract_energy("plusminus")
-                print(data)
-                raw_data[rows,cols] = reset[rows,cols]
-                raw_data[rows,items] = reset[rows,items]
-        for i in range(size[0]):
-            if i > rows:
-                print(i)
-                raw_data[rows,cols] = raw_data[rows,cols] + differential
-                raw_data[i,cols] = raw_data[i,cols] - differential
-                data = np.column_stack((labels,raw_data))
-                print(data)
-                raw_data[rows,cols] = reset[rows,cols]
-                raw_data[i,cols] = reset[i,cols]
 
-#These are the (-x,-x,): negatives.
-for rows in range(size[0]):
-    print(rows)
-    for cols in range(size[1]):
-        print(cols)
-        for items in range(size[0]):
-            if items == cols:
-                raw_data[rows,cols] = raw_data[rows,cols] - differential*2
-                data = np.column_stack((labels,raw_data))
-                save_and_gen()
-                extract_energy("doublenegatives")
-                print(data)
-                raw_data[rows,cols] = reset[rows,cols]
-            elif items > cols:
-                raw_data[rows,cols] = raw_data[rows,cols] - differential
-                raw_data[rows,items] = raw_data[rows,items] - differential
-                data = np.column_stack((labels,raw_data))
-                save_and_gen()
-                extract_energy("negatives")
-                print(data)
-                raw_data[rows,cols] = reset[rows,cols]
-                raw_data[rows,items] = reset[rows,items]
-        for i in range(size[0]):
-            if i > rows:
-                print(i)
-                raw_data[rows,cols] = raw_data[rows,cols] - differential
-                raw_data[i,cols] = raw_data[i,cols] - differential
-                data = np.column_stack((labels,raw_data))
-                print(data)
-                raw_data[rows,cols] = reset[rows,cols]
-                raw_data[i,cols] = reset[i,cols]
+#We will have to replace certain elements of this list with other elements above.
+zero_list = np.zeros((27,3))
 
-# To calculate the second derivative, some weird stuff has got to be figured out.
-a = [float(i) for i in a]
-b = [float(i) for i in b]
-c = [float(i) for i in c]
-d = [float(i) for i in d]
-e = [float(i) for i in e]
-f = [float(i) for i in f]
-reference = float(reference)
+print(second_energy_list_a)
+print(second_energy_list_b)
 
-second_derivative_a()
-second_derivative_b()
-"""
 print(a)
 print(b)
 print(c)
