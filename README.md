@@ -6,13 +6,13 @@ You probably need mpiexec on your supercomputer for this to run.
 
 It should work for any XYZ geometry, just skip a line or edit the numpy.genfromtext parameters.
 
-## Features
+Features
 --------
 
 - Automatically generates displacement geometries, then submits the jobs in molpro without filling up your disk with points.
 - Extracts the energy, then calculates numerical force constants in Hartree/Angstoms^2
 
-## Installation
+Installation
 ------------
 
 - Download the script and place it in the directory with the optimized geometry.
