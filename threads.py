@@ -402,7 +402,7 @@ for rows in range(size[0]):
                 raw_data[rows,cols] = reset[rows,cols]
                 raw_data[rows,items] = reset[rows,items]
 #Vertical distribution of displacements.
-        for i in range(size[0]):
+""""
             if i == rows:
 # X1 term.
                 raw_data[rows,cols] = raw_data[rows,cols] + differential *2
@@ -435,8 +435,9 @@ for rows in range(size[0]):
                 subprocess.call("rm input*.xml*", shell=True)
                 raw_data[rows,cols] = reset[rows,cols]
                 raw_data[i,cols] = reset[i,cols]
-
-            elif i > rows:
+"""
+        for i in range(size[0]):
+            if i > rows:
 # X1 and X2...
                 print(i)
                 raw_data[rows,cols] = raw_data[rows,cols] + differential
@@ -502,13 +503,19 @@ print(second_energy_list_b)
 
 second_energy_list_a = np.asarray(second_energy_list_a)
 second_energy_list_b = np.asarray(second_energy_list_b)
-second_energy_list_a = np.split(second_energy_list_a)
-second_energy_list_b = np.split(second_energy_list_b)
-
 
 #We will have to replace certain elements of this list with other elements above.
-zero_list = np.zeros((27,3))
+#Expand this using shape from above to get the correct number of items based on input.
+zero_array = np.zeros((27,3))
 
+#Converts Ha/A^2 to Ha/Bohr^2
+for n in second_energy_list_a:
+    second_energy_list_a[n] = (second_energy_list_a[n] * (0.529177208)**2)
+
+for n in second_energy_list_b:
+    second_energy_list_b[n] = (second_energy_list_b[n] * (0.529177208)**2)
+
+print(zero_array)
 print(second_energy_list_a)
 print(second_energy_list_b)
 
