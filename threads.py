@@ -228,7 +228,7 @@ def second_derivative_b():
         b.clear()
         c.clear()
         d.clear()
-        second_energy_list_b.append(second_energy)
+        second_energy_list_b.append(second_energy_b)
         print(second_energy_b)
 
 # FIRST DISP GENERATION
@@ -463,6 +463,63 @@ for rows in range(size[0]):
                 subprocess.call("rm input*.xml*", shell=True)
                 raw_data[rows,cols] = reset[rows,cols]
                 raw_data[i,cols] = reset[i,cols]
+            for j in range(size[1]):
+                if j > cols and i != 0:
+                    raw_data[rows,cols] = raw_data[rows,cols] + differential
+                    raw_data[i,j] = raw_data[i,j] + differential
+                    data = np.column_stack((labels,raw_data))
+                    print(data)
+                    np.savetxt("tmp.txt", data, delimiter=" ", fmt='%s')
+                    gen_pbs("pbs1")
+                    threads(1)
+                    nn+=1
+                    raw_data[rows,cols] = reset[rows,cols]
+                    raw_data[i,j] = reset[i,j]
+
+                    raw_data[rows,cols] = raw_data[rows,cols] + differential
+                    raw_data[i,j] = raw_data[i,j] + differential
+                    data = np.column_stack((labels,raw_data))
+                    print(data)
+                    np.savetxt("tmp2.txt", data, delimiter=" ", fmt='%s')
+                    gen_pbs("pbs2")
+                    threads(2)
+                    nn+=1
+                    raw_data[rows,cols] = reset[rows,cols]
+                    raw_data[i,j] = reset[i,j]
+
+                    raw_data[rows,cols] = raw_data[rows,cols] + differential
+                    raw_data[i,j] = raw_data[i,j] + differential
+                    data = np.column_stack((labels,raw_data))
+                    print(data)
+                    np.savetxt("tmp3.txt", data, delimiter=" ", fmt='%s')
+                    gen_pbs("pbs3")
+                    threads(3)
+                    nn+=1
+                    raw_data[rows,cols] = reset[rows,cols]
+                    raw_data[i,j] = reset[i,j]
+
+                    raw_data[rows,cols] = raw_data[rows,cols] + differential
+                    raw_data[i,j] = raw_data[i,j] + differential
+                    data = np.column_stack((labels,raw_data))
+                    print(data)
+                    np.savetxt("tmp4.txt", data, delimiter=" ", fmt='%s')
+                    gen_pbs("pbs4")
+                    threads(4)
+                    nn+=1
+                    run_jobs()
+                    extract_energy(1)
+                    extract_energy(2)
+                    extract_energy(3)
+                    extract_energy(4)
+                    second_derivative_b()
+                    subprocess.call("rm input*.com*", shell=True)
+                    subprocess.call("rm input*.pbs*", shell=True)
+                    subprocess.call("rm input*.out*", shell=True)
+                    subprocess.call("rm input*.xml*", shell=True)
+                    raw_data[rows,cols] = reset[rows,cols]
+                    raw_data[i,j] = reset[i,j]
+
+
 
 print(second_energy_list_a)
 print(second_energy_list_b)
@@ -484,13 +541,6 @@ for n in second_energy_list_b:
 print(zero_array)
 print(second_energy_list_a)
 print(second_energy_list_b)
-
-print(a)
-print(b)
-print(c)
-print(d)
-print(e)
-print(f)
 
 import psutil
 process = psutil.Process(os.getpid())
