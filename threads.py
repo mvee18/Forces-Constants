@@ -524,18 +524,18 @@ for rows in range(size[0]):
 print(second_energy_list_a)
 print(second_energy_list_b)
 
-second_energy_list_a = np.asarray(second_energy_list_a)
-second_energy_list_b = np.asarray(second_energy_list_b)
+np.asarray(second_energy_list_a)
+np.asarray(second_energy_list_b)
 
 #We will have to replace certain elements of this list with other elements above.
 #Expand this using shape from above to get the correct number of items based on input.
 zero_array = np.zeros((27,3))
 
 #Converts Ha/A^2 to Ha/Bohr^2
-for n in second_energy_list_a:
+for n in range(len(second_energy_list_a)):
     second_energy_list_a[n] = (second_energy_list_a[n] * (0.529177208)**2)
 
-for n in second_energy_list_b:
+for n in range(len(second_energy_list_b)):
     second_energy_list_b[n] = (second_energy_list_b[n] * (0.529177208)**2)
 
 print(zero_array)
