@@ -146,9 +146,12 @@ def extract_energy(numberofinput):
         zzz = zz.readlines()
         for line in zzz:
             if "!CCSD(T)-F12b total energy" in line:
+#                Found = True
                 line = line.split()
                 negatives.append(line[3])
                 zz.close()
+#                if Found = False:
+#                    print(nn)
     elif numberofinput == 3:
         zz = open("input3.out", 'r')
         zzz = zz.readlines()
@@ -340,7 +343,186 @@ for rows in range(size[0]):
                 subprocess.call("rm input*.out*", shell=True)
                 subprocess.call("rm input*.xml*", shell=True)
                 raw_data[rows,cols] = reset[rows,cols]
+#Vertical distribution of displacements.
+        for i in range(size[0]):
+            if i > rows:
+# X1 and X2...
+                print(i)
+                raw_data[rows,cols] = raw_data[rows,cols] + differential
+                raw_data[i,cols] = raw_data[i,cols] + differential
+                data = np.column_stack((labels,raw_data))
+                np.savetxt("tmp.txt", data, delimiter=" ", fmt='%s')
+                print(data)
+                gen_com("tmp.txt")
+                gen_pbs("pbs1")
+                threads(1)
+                nn+=1
+                raw_data[rows,cols] = reset[rows,cols]
+                raw_data[i,cols] = reset[i,cols]
+#-X1 and -X2
+                raw_data[rows,cols] = raw_data[rows,cols] - differential
+                raw_data[i,cols] = raw_data[i,cols] - differential
+                data = np.column_stack((labels,raw_data))
+                np.savetxt("tmp2.txt", data, delimiter=" ", fmt='%s')
+                print(data)
+                gen_com("tmp2.txt")
+                gen_pbs("pbs2")
+                threads(2)
+                nn+=1
+                raw_data[rows,cols] = reset[rows,cols]
+                raw_data[i,cols] = reset[i,cols]
+# -X1 and X2
+                raw_data[rows,cols] = raw_data[rows,cols] - differential
+                raw_data[i,cols] = raw_data[i,cols] + differential
+                data = np.column_stack((labels,raw_data))
+                np.savetxt("tmp3.txt", data, delimiter=" ", fmt='%s')
+                print(data)
+                gen_com("tmp3.txt")
+                gen_pbs("pbs3")
+                threads(3)
+                nn+=1
+                raw_data[rows,cols] = reset[rows,cols]
+                raw_data[i,cols] = reset[i,cols]
+# X1 and -X2.
+                raw_data[rows,cols] = raw_data[rows,cols] + differential
+                raw_data[i,cols] = raw_data[i,cols] - differential
+                data = np.column_stack((labels,raw_data))
+                np.savetxt("tmp4.txt", data, delimiter=" ", fmt='%s')
+                print(data)
+                gen_com("tmp4.txt")
+                gen_pbs("pbs4")
+                threads(4)
+                nn+=1
+                run_jobs()
+                extract_energy(1)
+                extract_energy(2)
+                extract_energy(3)
+                extract_energy(4)
+                second_derivative_b()
+                raw_data[rows,cols] = reset[rows,cols]
+                raw_data[i,cols] = reset[i,cols]
+            for j in range(size[1]):
+                if j > cols:
+                    raw_data[rows,cols] = raw_data[rows,cols] + differential
+                    raw_data[i,j] = raw_data[i,j] + differential
+                    data = np.column_stack((labels,raw_data))
+                    print(data)
+                    np.savetxt("tmp.txt", data, delimiter=" ", fmt='%s')
+                    gen_com("tmp.txt")
+                    gen_pbs("pbs1")
+                    threads(1)
+                    nn+=1
+                    raw_data[rows,cols] = reset[rows,cols]
+                    raw_data[i,j] = reset[i,j]
 
+                    raw_data[rows,cols] = raw_data[rows,cols] - differential
+                    raw_data[i,j] = raw_data[i,j] - differential
+                    data = np.column_stack((labels,raw_data))
+                    print(data)
+                    np.savetxt("tmp2.txt", data, delimiter=" ", fmt='%s')
+                    gen_com("tmp2.txt")
+                    gen_pbs("pbs2")
+                    threads(2)
+                    nn+=1
+                    raw_data[rows,cols] = reset[rows,cols]
+                    raw_data[i,j] = reset[i,j]
+
+                    raw_data[rows,cols] = raw_data[rows,cols] - differential
+                    raw_data[i,j] = raw_data[i,j] + differential
+                    data = np.column_stack((labels,raw_data))
+                    print(data)
+                    np.savetxt("tmp3.txt", data, delimiter=" ", fmt='%s')
+                    gen_com("tmp3.txt")
+                    gen_pbs("pbs3")
+                    threads(3)
+                    nn+=1
+                    raw_data[rows,cols] = reset[rows,cols]
+                    raw_data[i,j] = reset[i,j]
+
+                    raw_data[rows,cols] = raw_data[rows,cols] + differential
+                    raw_data[i,j] = raw_data[i,j] - differential
+                    data = np.column_stack((labels,raw_data))
+                    print(data)
+                    np.savetxt("tmp4.txt", data, delimiter=" ", fmt='%s')
+                    gen_com("tmp4.txt")
+                    gen_pbs("pbs4")
+                    threads(4)
+                    nn+=1
+                    run_jobs()
+                    extract_energy(1)
+                    extract_energy(2)
+                    extract_energy(3)
+                    extract_energy(4)
+                    second_derivative_b()
+                    subprocess.call("rm input*.com*", shell=True)
+                    subprocess.call("rm input*.pbs*", shell=True)
+                    subprocess.call("rm input*.out*", shell=True)
+                    subprocess.call("rm input*.xml*", shell=True)
+                    raw_data[rows,cols] = reset[rows,cols]
+                    raw_data[i,j] = reset[i,j]
+
+print(second_energy_list_a)
+print(second_energy_list_b)
+
+#Conversion to fort.15 format.
+np.asarray(second_energy_list_a)
+np.asarray(second_energy_list_b)
+
+#We will have to replace certain elements of this list with other elements above.
+#Expand this using shape from above to get the correct number of items based on input.
+zero_array = np.zeros((27,3))
+
+#Converts Ha/A^2 to Ha/Bohr^2
+for n in range(len(second_energy_list_a)):
+    second_energy_list_a[n] = (second_energy_list_a[n] * (0.529177208)**2)
+
+for n in range(len(second_energy_list_b)):
+    second_energy_list_b[n] = (second_energy_list_b[n] * (0.529177208)**2)
+
+print(zero_array)
+print(second_energy_list_a)
+print(second_energy_list_b)
+
+import psutil
+process = psutil.Process(os.getpid())
+print(process.memory_info()[0])
+
+# This repeats Step 1 of the second derivatives.
+"""
+            if i == rows:
+# X1 term.
+                raw_data[rows,cols] = raw_data[rows,cols] + differential *2
+                data = np.column_stack((labels,raw_data))
+                print(data)
+                np.savetxt("tmp5.txt", data, delimiter=" ", fmt='%s')
+                gen_com("tmp5.txt")
+                gen_pbs("pbs5")
+                threads(5)
+                nn+=1
+                raw_data[rows,cols] = reset[rows,cols]
+                raw_data[i,cols] = reset[i,cols]
+# -X1 term.
+                raw_data[rows,cols] = raw_data[rows,cols] - differential * 2
+                data = np.column_stack((labels,raw_data))
+                print(data)
+                np.savetxt("tmp6.txt", data, delimiter=" ", fmt='%s')
+                gen_com("tmp6.txt")
+                gen_pbs("pbs6")
+                threads(6)
+                nn+=1
+
+                run_jobs()
+                extract_energy(5)
+                extract_energy(6)
+                second_derivative_a()
+                subprocess.call("rm input*.com*", shell=True)
+                subprocess.call("rm input*.pbs*", shell=True)
+                subprocess.call("rm input*.out*", shell=True)
+                subprocess.call("rm input*.xml*", shell=True)
+                raw_data[rows,cols] = reset[rows,cols]
+                raw_data[i,cols] = reset[i,cols]
+"""
+"""
             elif items > cols:
 # These are the ways to arrange two terms together: positives.
                 raw_data[rows,cols] = raw_data[rows,cols] + differential
@@ -401,184 +583,4 @@ for rows in range(size[0]):
                 subprocess.call("rm input*.xml*", shell=True)
                 raw_data[rows,cols] = reset[rows,cols]
                 raw_data[rows,items] = reset[rows,items]
-#Vertical distribution of displacements.
-        for i in range(size[0]):
-            if i > rows:
-# X1 and X2...
-                print(i)
-                raw_data[rows,cols] = raw_data[rows,cols] + differential
-                raw_data[i,cols] = raw_data[i,cols] + differential
-                data = np.column_stack((labels,raw_data))
-                np.savetxt("tmp.txt", data, delimiter=" ", fmt='%s')
-                print(data)
-                gen_com("tmp.txt")
-                gen_pbs("pbs1")
-                threads(1)
-                nn+=1
-                raw_data[rows,cols] = reset[rows,cols]
-                raw_data[i,cols] = reset[i,cols]
-#-X1 and -X2
-                raw_data[rows,cols] = raw_data[rows,cols] - differential
-                raw_data[i,cols] = raw_data[i,cols] - differential
-                data = np.column_stack((labels,raw_data))
-                np.savetxt("tmp2.txt", data, delimiter=" ", fmt='%s')
-                print(data)
-                gen_com("tmp2.txt")
-                gen_pbs("pbs2")
-                threads(2)
-                nn+=1
-                raw_data[rows,cols] = reset[rows,cols]
-                raw_data[i,cols] = reset[i,cols]
-# -X1 and X2
-                raw_data[rows,cols] = raw_data[rows,cols] - differential
-                raw_data[i,cols] = raw_data[i,cols] + differential
-                data = np.column_stack((labels,raw_data))
-                np.savetxt("tmp3.txt", data, delimiter=" ", fmt='%s')
-                print(data)
-                gen_com("tmp3.txt")
-                gen_pbs("pbs3")
-                threads(3)
-                nn+=1
-                raw_data[rows,cols] = reset[rows,cols]
-                raw_data[i,cols] = reset[i,cols]
-# X1 and -X2.
-                raw_data[rows,cols] = raw_data[rows,cols] + differential
-                raw_data[i,cols] = raw_data[i,cols] - differential
-                data = np.column_stack((labels,raw_data))
-                np.savetxt("tmp4.txt", data, delimiter=" ", fmt='%s')
-                print(data)
-                gen_com("tmp4.txt")
-                gen_pbs("pbs4")
-                threads(4)
-                nn+=1
-                run_jobs()
-                extract_energy(1)
-                extract_energy(2)
-                extract_energy(3)
-                extract_energy(4)
-                second_derivative_b()
-                subprocess.call("rm input*.com*", shell=True)
-                subprocess.call("rm input*.pbs*", shell=True)
-                subprocess.call("rm input*.out*", shell=True)
-                subprocess.call("rm input*.xml*", shell=True)
-                raw_data[rows,cols] = reset[rows,cols]
-                raw_data[i,cols] = reset[i,cols]
-            for j in range(size[1]):
-                if j > cols and i != 0:
-                    raw_data[rows,cols] = raw_data[rows,cols] + differential
-                    raw_data[i,j] = raw_data[i,j] + differential
-                    data = np.column_stack((labels,raw_data))
-                    print(data)
-                    np.savetxt("tmp.txt", data, delimiter=" ", fmt='%s')
-                    gen_pbs("pbs1")
-                    threads(1)
-                    nn+=1
-                    raw_data[rows,cols] = reset[rows,cols]
-                    raw_data[i,j] = reset[i,j]
-
-                    raw_data[rows,cols] = raw_data[rows,cols] + differential
-                    raw_data[i,j] = raw_data[i,j] + differential
-                    data = np.column_stack((labels,raw_data))
-                    print(data)
-                    np.savetxt("tmp2.txt", data, delimiter=" ", fmt='%s')
-                    gen_pbs("pbs2")
-                    threads(2)
-                    nn+=1
-                    raw_data[rows,cols] = reset[rows,cols]
-                    raw_data[i,j] = reset[i,j]
-
-                    raw_data[rows,cols] = raw_data[rows,cols] + differential
-                    raw_data[i,j] = raw_data[i,j] + differential
-                    data = np.column_stack((labels,raw_data))
-                    print(data)
-                    np.savetxt("tmp3.txt", data, delimiter=" ", fmt='%s')
-                    gen_pbs("pbs3")
-                    threads(3)
-                    nn+=1
-                    raw_data[rows,cols] = reset[rows,cols]
-                    raw_data[i,j] = reset[i,j]
-
-                    raw_data[rows,cols] = raw_data[rows,cols] + differential
-                    raw_data[i,j] = raw_data[i,j] + differential
-                    data = np.column_stack((labels,raw_data))
-                    print(data)
-                    np.savetxt("tmp4.txt", data, delimiter=" ", fmt='%s')
-                    gen_pbs("pbs4")
-                    threads(4)
-                    nn+=1
-                    run_jobs()
-                    extract_energy(1)
-                    extract_energy(2)
-                    extract_energy(3)
-                    extract_energy(4)
-                    second_derivative_b()
-                    subprocess.call("rm input*.com*", shell=True)
-                    subprocess.call("rm input*.pbs*", shell=True)
-                    subprocess.call("rm input*.out*", shell=True)
-                    subprocess.call("rm input*.xml*", shell=True)
-                    raw_data[rows,cols] = reset[rows,cols]
-                    raw_data[i,j] = reset[i,j]
-
-
-
-print(second_energy_list_a)
-print(second_energy_list_b)
-
-np.asarray(second_energy_list_a)
-np.asarray(second_energy_list_b)
-
-#We will have to replace certain elements of this list with other elements above.
-#Expand this using shape from above to get the correct number of items based on input.
-zero_array = np.zeros((27,3))
-
-#Converts Ha/A^2 to Ha/Bohr^2
-for n in range(len(second_energy_list_a)):
-    second_energy_list_a[n] = (second_energy_list_a[n] * (0.529177208)**2)
-
-for n in range(len(second_energy_list_b)):
-    second_energy_list_b[n] = (second_energy_list_b[n] * (0.529177208)**2)
-
-print(zero_array)
-print(second_energy_list_a)
-print(second_energy_list_b)
-
-import psutil
-process = psutil.Process(os.getpid())
-print(process.memory_info()[0])
-
-
-# This repeats Step 1 of the second derivatives.
-"""
-            if i == rows:
-# X1 term.
-                raw_data[rows,cols] = raw_data[rows,cols] + differential *2
-                data = np.column_stack((labels,raw_data))
-                print(data)
-                np.savetxt("tmp5.txt", data, delimiter=" ", fmt='%s')
-                gen_com("tmp5.txt")
-                gen_pbs("pbs5")
-                threads(5)
-                nn+=1
-                raw_data[rows,cols] = reset[rows,cols]
-                raw_data[i,cols] = reset[i,cols]
-# -X1 term.
-                raw_data[rows,cols] = raw_data[rows,cols] - differential * 2
-                data = np.column_stack((labels,raw_data))
-                print(data)
-                np.savetxt("tmp6.txt", data, delimiter=" ", fmt='%s')
-                gen_com("tmp6.txt")
-                gen_pbs("pbs6")
-                threads(6)
-                nn+=1
-
-                run_jobs()
-                extract_energy(5)
-                extract_energy(6)
-                second_derivative_a()
-                subprocess.call("rm input*.com*", shell=True)
-                subprocess.call("rm input*.pbs*", shell=True)
-                subprocess.call("rm input*.out*", shell=True)
-                subprocess.call("rm input*.xml*", shell=True)
-                raw_data[rows,cols] = reset[rows,cols]
-                raw_data[i,cols] = reset[i,cols]
 """
