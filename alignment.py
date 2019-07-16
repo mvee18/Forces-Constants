@@ -76,7 +76,7 @@ x_list = 0
 print(a[0])
 print(len(a))
 print(len(b))
-
+"""
 for rows in range(zero_size[0]):
     for cols in range(zero_size[1]):
         if rows == 0 and cols == 0:
@@ -93,7 +93,7 @@ for rows in range(zero_size[0]):
                 x_list += 1
 
 
-
+"""
 print(zero_size)
 # The next three lines do not have repetitions
 #    if (rows % 9) == 0:
@@ -115,8 +115,8 @@ print(zero_size)
                 count += 1
 """
 print(zero_array)
-
 """
+
 for rows in range(size[0]):
     print(rows)
     for cols in range(size[1]):
@@ -195,8 +195,8 @@ for rows in range(size[0]):
                     print(raw_data)
                     raw_data[rows,cols] = reset[rows,cols]
                     raw_data[i,j] = reset[i,j]
-
-
+"""
+"""
             elif items > cols:
 # These are the ways to arrange two terms together: positives.
                 raw_data[rows,cols] = raw_data[rows,cols] + differential
@@ -231,3 +231,62 @@ for rows in range(size[0]):
                 raw_data[rows,cols] = reset[rows,cols]
                 raw_data[rows,items] = reset[rows,items]
 """
+
+#New Ideas:
+number_of_points = (size[0])**4
+geom_list = [0,0,0,0]
+
+zero_array = zero_array.astype('object')
+
+for i in range(27):
+    for j in range(3):
+        zero_array[i,j] = [0,0,0,0]
+
+array = []
+for atom1 in range(3):
+    coordinate_list1 = []
+    for coordinate1 in range(3):
+        atom_list1 = []
+        for atom2 in range(3):
+            coordinate_list2 = []
+            for coordinate2 in range(3):
+                coordinate_list2.append(coordinate2)
+            atom_list1.append(coordinate_list2)
+        coordinate_list1.append(atom_list1)
+    array.append(coordinate_list1)
+
+array = np.asarray(array)
+
+shapefour = array.shape
+print(shapefour)
+
+def convert(list):
+    s = [str(i) for i in list]
+    res = int("".join(s))
+    return(res)
+
+def manipulate_geometry(a1,c1,a2,c2):
+
+
+for i in range(shapefour[0]):
+    for j in range(shapefour[1]):
+        Found = False
+        for k in range(shapefour[2]):
+            for l in range(shapefour[3]):
+                if i == k and j == l:
+                    array[i,j,k,l] = 7
+                    value = (i,j,k,l)
+                    res = convert(value)
+                    Found = True
+                elif Found:
+                    comparison_list = (i,j,k,l)
+                    comparevalue = convert(comparison_list)
+                    if comparevalue > res:
+                        array[i,j,k,l] = 777
+                        print(comparevalue, res)
+                    else:
+                        array[i,j,k,l] = 0
+                else:
+                    array[i,j,k,l] = 0
+
+print(array)
