@@ -346,7 +346,7 @@ def manipulate_geometry_second(a1,c1,a2,c2):
         gen_pbs("pbs5")
         threads(5)
         nn+=1
-        raw_data[:] = reset[:]
+        raw_data[a1,c1] = reset[a1,c1]
 
         raw_data[a2,c2] = raw_data[a2,c2] - differential*2
         neg_dif = np.column_stack((labels,raw_data))
@@ -363,13 +363,14 @@ def manipulate_geometry_second(a1,c1,a2,c2):
         energy = second_derivative_a()
 
         energy = (energy * (0.529177208)**2)
-
+#        energy = 9.12
         array[a1,c1,a2,c2] = energy
 
         subprocess.call("rm input*.com*", shell=True)
+        subprocess.call("rm input*.out*", shell=True)
         subprocess.call("rm input*.pbs*", shell=True)
         subprocess.call("rm input*.xml*", shell=True)
-        raw_data[:] = reset[:]
+        raw_data[a1,c1] = reset[a1,c1]
     else:
         nn = 0
         raw_data[a1,c1] = raw_data[a1,c1] + differential
@@ -381,37 +382,42 @@ def manipulate_geometry_second(a1,c1,a2,c2):
         gen_pbs("pbs1")
         threads(1)
         nn+=1
-        raw_data[:] = reset[:]
+        raw_data[a1,c1] = reset[a1,c1]
+        raw_data[a2,c2] = reset[a2,c2]
 
         raw_data[a1,c1] = raw_data[a1,c1] - differential
         raw_data[a2,c2] = raw_data[a2,c2] - differential
+        data = np.column_stack((labels,raw_data))
         np.savetxt("tmp2.txt", data, delimiter=" ", fmt='%s')
         print(data)
         gen_com("tmp2.txt")
         gen_pbs("pbs2")
         threads(2)
         nn+=1
-        raw_data[:] = reset[:]
+        raw_data[a1,c1] = reset[a1,c1]
+        raw_data[a2,c2] = reset[a2,c2]
 
         raw_data[a1,c1] = raw_data[a1,c1] - differential
         raw_data[a2,c2] = raw_data[a2,c2] + differential
+        data = np.column_stack((labels,raw_data))
         np.savetxt("tmp3.txt", data, delimiter=" ", fmt='%s')
         print(data)
         gen_com("tmp3.txt")
         gen_pbs("pbs3")
         threads(3)
         nn+=1
-        raw_data[:] = reset[:]
+        raw_data[a1,c1] = reset[a1,c1]
+        raw_data[a2,c2] = reset[a2,c2]
 
         raw_data[a1,c1] = raw_data[a1,c1] + differential
         raw_data[a2,c2] = raw_data[a2,c2] - differential
+        data = np.column_stack((labels,raw_data))
         np.savetxt("tmp4.txt", data, delimiter=" ", fmt='%s')
         print(data)
         gen_com("tmp4.txt")
         gen_pbs("pbs4")
         threads(4)
         nn+=1
-        raw_data[:] = reset[:]
 
         run_jobs()
         extract_energy(1)
@@ -420,14 +426,15 @@ def manipulate_geometry_second(a1,c1,a2,c2):
         extract_energy(4)
         energyb = second_derivative_b()
         energyb = (energyb*(0.529177208)**2)
-
+#        energyb = 1212.1
         array[a1,c1,a2,c2] = energyb
 
         subprocess.call("rm input*.com*", shell=True)
+        subprocess.call("rm input*.out*", shell=True)
         subprocess.call("rm input*.pbs*", shell=True)
         subprocess.call("rm input*.xml*", shell=True)
-        raw_data[:] = reset[:]
-        raw_data[:] = reset[:]
+        raw_data[a1,c1] = reset[a1,c1]
+        raw_data[a2,c2] = reset[a2,c2]
 #XYZ Flagging
 
 for i in range(shapefour[0]):
@@ -440,6 +447,7 @@ for i in range(shapefour[0]):
                     value = (i,j,k,l)
                     res = convert(value)
                     Found = True
+                    print(i,j,k,l)
                     manipulate_geometry_second(i,j,k,l)
                 elif Found:
                     comparison_list = (i,j,k,l)
@@ -447,11 +455,8 @@ for i in range(shapefour[0]):
                     if comparevalue > res:
                         array[i,j,k,l] = 777
                         print(comparevalue, res)
+                        print(i,j,k,l)
                         manipulate_geometry_second(i,j,k,l)
-                    else:
-                        array[i,j,k,l] = 0
-                else:
-                    array[i,j,k,l] = 0
 
 print(array)
 
