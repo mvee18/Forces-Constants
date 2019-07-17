@@ -21,6 +21,8 @@ input_list = []
 for i in range(num_of_jobs):
     input_list.append(i)
 
+print(size[0])
+
 # We need the reference energy.
 yy = open("reference.out", 'r')
 yyy = yy.readlines()
@@ -50,6 +52,7 @@ def gen_com(name):
     elif filename == "tmp6.txt":
         f = open("input6.com", 'w+')
     f.write("memory,%d,m\n" %memory_list[0])
+    f.write("gthresh,energy=1.d-12,zero=1.d-22,oneint=1.d-22,twoint=1.d-22;\n")
     f.write("\nnocompress;\n")
     f.write("geomtyp=xyz\n")
     f.write("angstrom\n")
@@ -60,7 +63,7 @@ def gen_com(name):
     f.write("basis=cc-pVTZ-F12\n")
     f.write("set,charge=0\n")
     f.write("set,spin=0\n")
-    f.write("hf\n")
+    f.write("{hf;accu,20;}\n")
     f.write("{CCSD(T)-F12}")
     f.close()
     temp.close()
@@ -284,9 +287,6 @@ f = doublenegatives
 
 # This is for all ways to add two terms together.
 
-np.set_printoptions(suppress=True,
-   formatter={'float_kind':'{:20.10f}'.format})
-
 zero_array = np.zeros((27,3))
 
 zero_size = zero_array.shape
@@ -297,25 +297,15 @@ x_list = 0
 
 print(zero_size)
 
-#New Ideas:
-number_of_points = (size[0])**4
-geom_list = [0,0,0,0]
-
-zero_array = zero_array.astype('object')
-
-for i in range(27):
-    for j in range(3):
-        zero_array[i,j] = [0,0,0,0]
-
 #Array generation: these will be edited later to work for larger arrays.
 array = []
-for atom1 in range(3):
+for atom1 in range(size[0]):
     coordinate_list1 = []
-    for coordinate1 in range(3):
+    for coordinate1 in range(size[0]):
         atom_list1 = []
-        for atom2 in range(3):
+        for atom2 in range(size[0]):
             coordinate_list2 = []
-            for coordinate2 in range(3):
+            for coordinate2 in range(size[0]):
                 coordinate_list2.append(coordinate2)
             atom_list1.append(coordinate_list2)
         coordinate_list1.append(atom_list1)
@@ -365,6 +355,7 @@ def manipulate_geometry_second(a1,c1,a2,c2):
         energy = (energy * (0.529177208)**2)
 #        energy = 9.12
         array[a1,c1,a2,c2] = energy
+        array[a2,c2,a1,c1] = energy
 
         subprocess.call("rm input*.com*", shell=True)
         subprocess.call("rm input*.out*", shell=True)
@@ -428,6 +419,7 @@ def manipulate_geometry_second(a1,c1,a2,c2):
         energyb = (energyb*(0.529177208)**2)
 #        energyb = 1212.1
         array[a1,c1,a2,c2] = energyb
+        array[a2,c2,a1,c1] = energyb
 
         subprocess.call("rm input*.com*", shell=True)
         subprocess.call("rm input*.out*", shell=True)
@@ -437,28 +429,66 @@ def manipulate_geometry_second(a1,c1,a2,c2):
         raw_data[a2,c2] = reset[a2,c2]
 #XYZ Flagging
 
+array = array.astype(float)
+print(array.dtype)
+
+#o = [0.00037726010759797646, 1.3377116501089859, 0.7794059200705306, 0.0004889599836133129, 2.4523686801103395, 1.6416705300059675, 0.00037726010759797646, 1.337711640019279, 0.7794059200705306]
+#p = [0.0, 0.0, -0.000109899929157109, 0.0, 0.0, -9.700045211502584e-06, 0.0, 0.0, 0.839248540103199, 0.0, -1.2260569000943633, -0.7274316999428265, 0.0, -0.11139000008597577, -0.1118235799424383, 0.0, -0.9510723099026563, -0.8207080598765515, 0.0, 0.1118235799424383, 0.04156718006242954, 0.0, 0.0, -0.000109899929157109, 0.0, 0.0, 0.0, 0.0, -1.2260569000943633, 0.951072299955058, 0.0, 0.7274316999428265, -0.8207080499289532, 0.0, 0.0, -0.839248540103199]
+
+#for i in range(len(o)):
+#    o[i] = (o[i] * (0.529177208)**2)
+
+#for i in range(len(p)):
+#    p[i] = (p[i] * (0.529177208)**2)
+
+#print(o)
+#print(p)
+
+#element1 = 0
+#element2 = 0
+
 for i in range(shapefour[0]):
     for j in range(shapefour[1]):
         Found = False
         for k in range(shapefour[2]):
             for l in range(shapefour[3]):
                 if i == k and j == l:
-                    array[i,j,k,l] = 7
+#                    array[i,j,k,l] = o[element1]
+#                    array[k,l,i,j] = o[element1]
                     value = (i,j,k,l)
                     res = convert(value)
                     Found = True
                     print(i,j,k,l)
+#                    element1 +=
                     manipulate_geometry_second(i,j,k,l)
                 elif Found:
                     comparison_list = (i,j,k,l)
                     comparevalue = convert(comparison_list)
                     if comparevalue > res:
-                        array[i,j,k,l] = 777
+#                        array[i,j,k,l] = p[element2]
+#                        array[k,l,i,j] = p[element2]
                         print(comparevalue, res)
                         print(i,j,k,l)
                         manipulate_geometry_second(i,j,k,l)
+                        element2 += 1
 
-print(array)
+np.set_printoptions(suppress=True,
+   formatter={'float_kind':'{:20.10f}'.format})
+
+final = []
+
+for i in range(shapefour[0]):
+    for j in range(shapefour[1]):
+        for k in range(shapefour[2]):
+            final.append(array[i,j,k].tolist())
+
+final = np.asarray(final)
+print(final)
+
+e = open('spectro.in','w+')
+#Generalize this.
+e.write('    3   18')
+np.savetxt('spectro.in',final,fmt='%20.10f')
 
 import psutil
 process = psutil.Process(os.getpid())
