@@ -200,7 +200,6 @@ def first_derivative():
         first_energy = ((float(positives[i]) - float(negatives[i]))/(2*differential))
         positives.clear()
         negatives.clear()
-        print(first_energy)
 
 second_energy_list_a = []
 second_energy_list_b = []
@@ -212,6 +211,7 @@ def second_derivative_a():
         second_energy = (float(e[i]) - 2*reference + float(f[i])) / ((differential*2)**2)
         e.clear()
         f.clear()
+        second_energy_list_a.append(second_energy)
         return second_energy
 
 # More complicated second derivatives:
@@ -222,6 +222,7 @@ def second_derivative_b():
         b.clear()
         c.clear()
         d.clear()
+        second_energy_list_b.append(second_energy_b)
         return second_energy_b
 
 """
@@ -300,13 +301,13 @@ print(zero_size)
 #New Ideas:
 number_of_points = (size[0])**4
 geom_list = [0,0,0,0]
-
-zero_array = zero_array.astype('object')
+"""
+zero_array = zero_array.astype(float)
 
 for i in range(27):
     for j in range(3):
         zero_array[i,j] = [0,0,0,0]
-
+"""
 #Array generation: these will be edited later to work for larger arrays.
 array = []
 for atom1 in range(3):
@@ -361,10 +362,12 @@ def manipulate_geometry_second(a1,c1,a2,c2):
         extract_energy(5)
         extract_energy(6)
         energy = second_derivative_a()
+        print(energy)
 
         energy = (energy * (0.529177208)**2)
 #        energy = 9.12
         array[a1,c1,a2,c2] = energy
+        array[a2,c2,a1,c1] = energy
 
         subprocess.call("rm input*.com*", shell=True)
         subprocess.call("rm input*.out*", shell=True)
@@ -426,9 +429,12 @@ def manipulate_geometry_second(a1,c1,a2,c2):
         extract_energy(4)
         energyb = second_derivative_b()
         energyb = (energyb*(0.529177208)**2)
+        print(energyb)
 #        energyb = 1212.1
         array[a1,c1,a2,c2] = energyb
-
+        array[a2,c2,a1,c1] = energyb
+#[i,j,k,l]
+#[k,l,i,j]
         subprocess.call("rm input*.com*", shell=True)
         subprocess.call("rm input*.out*", shell=True)
         subprocess.call("rm input*.pbs*", shell=True)
@@ -459,6 +465,9 @@ for i in range(shapefour[0]):
                         manipulate_geometry_second(i,j,k,l)
 
 print(array)
+
+print(second_energy_list_a)
+print(second_energy_list_b)
 
 import psutil
 process = psutil.Process(os.getpid())
