@@ -203,7 +203,6 @@ def first_derivative():
         first_energy = ((float(positives[i]) - float(negatives[i]))/(2*differential))
         positives.clear()
         negatives.clear()
-        print(first_energy)
 
 second_energy_list_a = []
 second_energy_list_b = []
@@ -215,6 +214,7 @@ def second_derivative_a():
         second_energy = (float(e[i]) - 2*reference + float(f[i])) / ((differential*2)**2)
         e.clear()
         f.clear()
+        second_energy_list_a.append(second_energy)
         return second_energy
 
 # More complicated second derivatives:
@@ -225,6 +225,7 @@ def second_derivative_b():
         b.clear()
         c.clear()
         d.clear()
+        second_energy_list_b.append(second_energy_b)
         return second_energy_b
 
 """
@@ -351,6 +352,7 @@ def manipulate_geometry_second(a1,c1,a2,c2):
         extract_energy(5)
         extract_energy(6)
         energy = second_derivative_a()
+        print(energy)
 
         energy = (energy * (0.529177208)**2)
 #        energy = 9.12
@@ -417,6 +419,7 @@ def manipulate_geometry_second(a1,c1,a2,c2):
         extract_energy(4)
         energyb = second_derivative_b()
         energyb = (energyb*(0.529177208)**2)
+        print(energyb)
 #        energyb = 1212.1
         array[a1,c1,a2,c2] = energyb
         array[a2,c2,a1,c1] = energyb
