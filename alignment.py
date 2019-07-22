@@ -178,15 +178,12 @@ def third_geometries():
         elif zipped[0] != zipped[1] and zipped[1] != zipped[2]:
             print("single term")
             print(zipped)
-            triple_third_terms(0,1,2)
+            triple_third_terms(0,1,2,zipped)
 
-#            print(zipped)
         else:
             print("you dun goofed")
         row_list.clear()
         col_list.clear()
-#        for items in zipped:
-#            print(items)
 
 
 third_geometries()
