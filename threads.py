@@ -81,6 +81,10 @@ def gen_pbs(name):
         f = open("input5.pbs", 'w+')
     elif filename == "pbs6":
         f = open("input6.pbs", 'w+')
+    elif filename == "pbs7":
+        f = open("input7.pbs", 'w+')
+    elif filename == "pbs8":
+        f = open("input8.pbs", 'w+')
     f.write("#!/bin/sh\n")
     f.write("#PBS -N job{0}\n".format(nn))
     f.write("#PBS -S /bin/bash\n")
@@ -111,6 +115,10 @@ def gen_pbs(name):
         f.write("mpiexec molpro.exe input5.com\n")
     elif filename == "pbs6":
         f.write("mpiexec molpro.exe input6.com\n")
+    elif filename == "pbs7":
+        f.write("mpiexec molpro.exe input7.com\n")
+    elif filename == "pbs8":
+        f.write("mpiexec molpro.exe input8.com\n")
     f.write("date\n\n")
 
     f.write("rm -rf $TMPDIR")
@@ -186,6 +194,22 @@ def extract_energy(numberofinput):
                 line = line.split()
                 doublenegatives.append(line[3])
                 zz.close()
+    elif numberofinput == 7:
+        zz = open("input7.out", 'r')
+        zzz = zz.readlines()
+        for line in zzz:
+            if "!CCSD(T)-F12b total energy" in line:
+                line = line.split()
+                seven_list.append(line[3])
+                zz.close()
+    elif numberofinput == 8:
+        zz = open("input8.out", 'r')
+        zzz = zz.readlines()
+        for line in zzz:
+            if "!CCSD(T)-F12b total energy" in line:
+                line = line.split()
+                eight_list.append(line[3])
+                zz.close()
 
 positives = []
 negatives = []
@@ -193,6 +217,8 @@ minusplus = []
 plusminus = []
 doublepositives = []
 doublenegatives = []
+seven_list = []
+eight_list = []
 
 # First derivatives.
 # Could speed this up by removing the iterator, since there is no longer more than one item in the list.
@@ -259,10 +285,6 @@ for rows in range(size[0]):
         subprocess.call("rm input*.xml*", shell=True)
         raw_data[rows,cols] = reset[rows,cols]
 """
-print(threadslist)
-
-print(positives)
-print(negatives)
 
 positives.clear()
 negatives.clear()
@@ -507,80 +529,191 @@ def double_third_terms(zipped,paired,unpaired):
     raw_data[zipped[paired]] = raw_data[zipped[paired]] + 2 * differential
     raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] + differential
 #    print(raw_data)
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp.txt")
+    gen_pbs("pbs1")
+    threads(1)
     raw_data[:] = reset[:]
 
     raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] + differential
 #    print(raw_data)
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp2.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp2.txt")
+    gen_pbs("pbs2")
+    threads(2)
     raw_data[:] = reset[:]
 
     raw_data[zipped[paired]] = raw_data[zipped[paired]] - 2 * differential
     raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] - differential
 #    print(raw_data)
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp3.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp3.txt")
+    gen_pbs("pbs3")
+    threads(3)
     raw_data[:] = reset[:]
 
     raw_data[zipped[paired]] = raw_data[zipped[paired]] + 2 * differential
     raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] - differential
 #    print(raw_data)
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp4.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp4.txt")
+    gen_pbs("pbs4")
+    threads(4)
     raw_data[:] = reset[:]
 
     raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] - differential
 #    print(raw_data)
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp5.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp5.txt")
+    gen_pbs("pbs5")
+    threads(5)
     raw_data[:] = reset[:]
 
     raw_data[zipped[paired]] = raw_data[zipped[paired]] - 2 * differential
     raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] - differential
 #    print(raw_data)
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp6.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp6.txt")
+    gen_pbs("pbs6")
+    threads(6)
     raw_data[:] = reset[:]
+
+    run_jobs()
+    extract_energy(1)
+    extract_energy(2)
+    extract_energy(3)
+    extract_energy(4)
+    extract_energy(5)
+    extract_energy(6)
+    third_derivatives_b()
+    subprocess.call("rm input*.com*", shell=True)
+    subprocess.call("rm input*.out*", shell=True)
+    subprocess.call("rm input*.pbs*", shell=True)
+    subprocess.call("rm input*.xml*", shell=True)
 
 def triple_third_terms(coord1,coord2,coord3,zipped):
     raw_data[zipped[coord1]] = raw_data[zipped[coord1]] + differential
     raw_data[zipped[coord2]] = raw_data[zipped[coord2]] + differential
     raw_data[zipped[coord3]] = raw_data[zipped[coord3]] + differential
 #    print(raw_data)
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp.txt")
+    gen_pbs("pbs1")
+    threads(1)
     raw_data[:] = reset[:]
 
     raw_data[zipped[coord1]] = raw_data[zipped[coord1]] + differential
     raw_data[zipped[coord2]] = raw_data[zipped[coord2]] - differential
     raw_data[zipped[coord3]] = raw_data[zipped[coord3]] + differential
 #    print(raw_data)
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp2.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp2.txt")
+    gen_pbs("pbs2")
+    threads(2)
     raw_data[:] = reset[:]
 
     raw_data[zipped[coord1]] = raw_data[zipped[coord1]] - differential
     raw_data[zipped[coord2]] = raw_data[zipped[coord2]] + differential
     raw_data[zipped[coord3]] = raw_data[zipped[coord3]] + differential
 #    print(raw_data)
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp3.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp3.txt")
+    gen_pbs("pbs3")
+    threads(3)
     raw_data[:] = reset[:]
 
     raw_data[zipped[coord1]] = raw_data[zipped[coord1]] - differential
     raw_data[zipped[coord2]] = raw_data[zipped[coord2]] - differential
     raw_data[zipped[coord3]] = raw_data[zipped[coord3]] + differential
 #    print(raw_data)
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp4.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp4.txt")
+    gen_pbs("pbs4")
+    threads(4)
     raw_data[:] = reset[:]
 
     raw_data[zipped[coord1]] = raw_data[zipped[coord1]] + differential
     raw_data[zipped[coord2]] = raw_data[zipped[coord2]] + differential
     raw_data[zipped[coord3]] = raw_data[zipped[coord3]] - differential
 #    print(raw_data)
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp5.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp5.txt")
+    gen_pbs("pbs5")
+    threads(5)
     raw_data[:] = reset[:]
 
     raw_data[zipped[coord1]] = raw_data[zipped[coord1]] + differential
     raw_data[zipped[coord2]] = raw_data[zipped[coord2]] - differential
     raw_data[zipped[coord3]] = raw_data[zipped[coord3]] - differential
 #    print(raw_data)
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp6.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp6.txt")
+    gen_pbs("pbs6")
+    threads(6)
     raw_data[:] = reset[:]
 
     raw_data[zipped[coord1]] = raw_data[zipped[coord1]] - differential
     raw_data[zipped[coord2]] = raw_data[zipped[coord2]] + differential
     raw_data[zipped[coord3]] = raw_data[zipped[coord3]] - differential
 #    print(raw_data)
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp7.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp7.txt")
+    gen_pbs("pbs7")
+    threads(7)
     raw_data[:] = reset[:]
 
     raw_data[zipped[coord1]] = raw_data[zipped[coord1]] - differential
     raw_data[zipped[coord2]] = raw_data[zipped[coord2]] - differential
     raw_data[zipped[coord3]] = raw_data[zipped[coord3]] - differential
 #    print(raw_data)
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp8.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp8.txt")
+    gen_pbs("pbs8")
+    threads(8)
     raw_data[:] = reset[:]
 
+    run_jobs()
+    extract_energy(1)
+    extract_energy(2)
+    extract_energy(3)
+    extract_energy(4)
+    extract_energy(5)
+    extract_energy(6)
+    extract_energy(7)
+    extract_energy(8)
+    third_derivatives_c()
+    subprocess.call("rm input*.com*", shell=True)
+    subprocess.call("rm input*.out*", shell=True)
+    subprocess.call("rm input*.pbs*", shell=True)
+    subprocess.call("rm input*.xml*", shell=True)
 #THIRD DERIVATIVES.
 #You can also turn this into X,Y,Z instead of 0,1,2, but I think it's easier this way since you can use all ints.
 
@@ -608,19 +741,19 @@ for row in range(third_array_shape[0]):
             third_array[row,col,1] = int(third_array[row,col,1])
             determine_coordinate(row,col,1)
 
-print(third_array)
+#print(third_array)
 
 row_list = []
 col_list = []
 
-a = []
-b = []
-c = []
-d = []
-e = []
-f = []
-g = []
-h = []
+a = positives
+b = plusminus
+c = minusplus
+d = negatives
+e = doublepositives
+f = doublenegatives
+g = seven_list
+h = eight_list
 
 def third_geometries():
     for i in range(third_array_shape[0]):
@@ -633,12 +766,51 @@ def third_geometries():
             print("triple found")
             print(zipped)
             raw_data[zipped[0]] = raw_data[zipped[0]] + 3 * differential
-#            print(raw_data)
+            data = np.column_stack((labels,raw_data))
+            np.savetxt("tmp.txt", data, delimiter=" ", fmt='%s')
+            print(data)
+            gen_com("tmp.txt")
+            gen_pbs("pbs1")
+            threads(1)
             raw_data[:] = reset[:]
 
             raw_data[zipped[0]] = raw_data[zipped[0]] - 3*differential
-#            print(raw_data)
+            data = np.column_stack((labels,raw_data))
+            np.savetxt("tmp2.txt", data, delimiter=" ", fmt='%s')
+            print(data)
+            gen_com("tmp2.txt")
+            gen_pbs("pbs2")
+            threads(2)
             raw_data[:] = reset[:]
+
+            raw_data[zipped[0]] = raw_data[zipped[0]] + differential
+            data = np.column_stack((labels,raw_data))
+            np.savetxt("tmp3.txt", data, delimiter=" ", fmt='%s')
+            print(data)
+            gen_com("tmp3.txt")
+            gen_pbs("pbs3")
+            threads(3)
+            raw_data[:] = reset[:]
+
+            raw_data[zipped[0]] = raw_data[zipped[0]] - differential
+            data = np.column_stack((labels,raw_data))
+            np.savetxt("tmp4.txt", data, delimiter=" ", fmt='%s')
+            print(data)
+            gen_com("tmp4.txt")
+            gen_pbs("pbs4")
+            threads(4)
+            raw_data[:] = reset[:]
+
+            run_jobs()
+            extract_energy(1)
+            extract_energy(2)
+            extract_energy(3)
+            extract_energy(4)
+            third_derivatives_a()
+            subprocess.call("rm input*.com*", shell=True)
+            subprocess.call("rm input*.out*", shell=True)
+            subprocess.call("rm input*.pbs*", shell=True)
+            subprocess.call("rm input*.xml*", shell=True)
 
         elif zipped[0] == zipped[1]:
             print("double found")
@@ -658,17 +830,67 @@ def third_geometries():
         elif zipped[0] != zipped[1] and zipped[1] != zipped[2]:
             print("single term")
             print(zipped)
-            triple_third_terms(0,1,2,zipped)
+#            triple_third_terms(0,1,2,zipped)
 
         else:
             print("you dun goofed")
         row_list.clear()
         col_list.clear()
 
+def third_derivatives_a():
+    print(a,b,c)
+    third_energy_a = ((float(a[0])
+                    - 3*float(c[0])
+                    + 3*float(d[0])
+                    - float(b[0]))
+                    / ((2*.differential)**3))
+    third_energy_a = (third_energy_a * (0.529177208)**2)
+    print(third_energy_a)
+    a.clear()
+    b.clear()
+    c.clear()
+
+def third_derivatives_b():
+    third_energy_b = ((float(a[0])
+                    - 2*float(b[0])
+                    + float(c[0])
+                    - float(d[0])
+                    + 2*float(e[0])
+                    - float(f[0]))
+                    / ((2*.differential)**2)) * (1/2*differential)
+    third_energy_b = (third_energy_b * (0.529177208)**2)
+    print(third_energy_b)
+    a.clear()
+    b.clear()
+    c.clear()
+    d.clear()
+    e.clear()
+    f.clear()
+
+def third_derivatives_c():
+    third_energy_c = ((float(a[0])
+                    - float(b[0])
+                    - float(c[0])
+                    + float(d[0])
+                    - float(e[0])
+                    + float(f[0])
+                    + float(g[0])
+                    + float(h[0]))
+                    / (4*(differential**2)))
+                    * (1/2*differential)
+
+    third_energy_c = (third_energy_c * (0.529177208)**2)
+    print(third_energy_c)
+    a.clear()
+    b.clear()
+    c.clear()
+    d.clear()
+    e.clear()
+    f.clear()
+    g.clear()
+    h.clear()
 
 third_geometries()
-
-
 
 import psutil
 process = psutil.Process(os.getpid())
