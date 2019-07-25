@@ -48,6 +48,10 @@ def gen_com(name):
         f = open("input5.com", 'w+')
     elif filename == "tmp6.txt":
         f = open("input6.com", 'w+')
+    elif filename == "tmp7.txt":
+        f = open("input7.com", 'w+')
+    elif filename == "tmp8.txt":
+        f = open("input8.com", 'w+')
     f.write("memory,%d,m\n" %memory_list[0])
     f.write("gthresh,energy=1.d-12,zero=1.d-22,oneint=1.d-22,twoint=1.d-22;\n")
 #            gthresh,optgrad=1.d-8,optstep=1.d-8;
@@ -753,7 +757,7 @@ b = plusminus
 c = minusplus
 d = negatives
 e = doublepositives
-f = doublenegatives
+ff = doublenegatives
 g = seven_list
 h = eight_list
 
@@ -855,13 +859,13 @@ def third_derivatives_a():
     d.clear()
 
 def third_derivatives_b():
-    print(a,b,c,d,e,f)
+    print(a,b,c,d,e,ff)
     third_energy_b = ((float(a[0])
                     - 2*float(b[0])
                     + float(c[0])
                     - float(d[0])
                     + 2*float(e[0])
-                    - float(f[0]))
+                    - float(ff[0]))
                     / ((2*differential)**2)) * (1/2*differential)
     third_energy_b = (third_energy_b * (0.529177208)**3)
     print(third_energy_b)
@@ -871,16 +875,16 @@ def third_derivatives_b():
     c.clear()
     d.clear()
     e.clear()
-    f.clear()
+    ff.clear()
 
 def third_derivatives_c():
-    print(a,b,c,d,e,f,g,h)
+    print(a,b,c,d,e,ff,g,h)
     third_energy_c = ((float(a[0])
                     - float(b[0])
                     - float(c[0])
                     + float(d[0])
                     - float(e[0])
-                    + float(f[0])
+                    + float(ff[0])
                     + float(g[0])
                     + float(h[0]))
                     / (4*(differential**2))) * (1/2*differential)
@@ -893,7 +897,7 @@ def third_derivatives_c():
     c.clear()
     d.clear()
     e.clear()
-    f.clear()
+    ff.clear()
     g.clear()
     h.clear()
 
