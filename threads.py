@@ -832,10 +832,10 @@ def third_geometries():
         elif zipped[0] != zipped[1] and zipped[1] != zipped[2]:
             print("single term")
             print(zipped)
-#            triple_third_terms(0,1,2,zipped)
+            triple_third_terms(0,1,2,zipped)
 
         else:
-            print("you dun goofed")
+            raise Exception("Unable to iterate over all coordinates. Check the geometry.")
         row_list.clear()
         col_list.clear()
 
@@ -847,6 +847,7 @@ def third_derivatives_a():
                     - float(b[0]))
                     / ((2*differential)**3))
     third_energy_a = (third_energy_a * (0.529177208)**3)
+    print(third_energy_a)
     third_energy_array.append(third_energy_a)
     a.clear()
     b.clear()
@@ -854,6 +855,7 @@ def third_derivatives_a():
     d.clear()
 
 def third_derivatives_b():
+    print(a,b,c,d,e,f)
     third_energy_b = ((float(a[0])
                     - 2*float(b[0])
                     + float(c[0])
@@ -872,6 +874,7 @@ def third_derivatives_b():
     f.clear()
 
 def third_derivatives_c():
+    print(a,b,c,d,e,f,g,h)
     third_energy_c = ((float(a[0])
                     - float(b[0])
                     - float(c[0])
