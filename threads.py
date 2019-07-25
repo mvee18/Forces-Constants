@@ -746,6 +746,8 @@ for row in range(third_array_shape[0]):
 row_list = []
 col_list = []
 
+third_energy_array = []
+
 a = positives
 b = plusminus
 c = minusplus
@@ -838,17 +840,18 @@ def third_geometries():
         col_list.clear()
 
 def third_derivatives_a():
-    print(a,b,c)
+    print(a,c,d,b)
     third_energy_a = ((float(a[0])
                     - 3*float(c[0])
                     + 3*float(d[0])
                     - float(b[0]))
-                    / ((2*.differential)**3))
-    third_energy_a = (third_energy_a * (0.529177208)**2)
-    print(third_energy_a)
+                    / ((2*differential)**3))
+    third_energy_a = (third_energy_a * (0.529177208)**3)
+    third_energy_array.append(third_energy_a)
     a.clear()
     b.clear()
     c.clear()
+    d.clear()
 
 def third_derivatives_b():
     third_energy_b = ((float(a[0])
@@ -857,9 +860,10 @@ def third_derivatives_b():
                     - float(d[0])
                     + 2*float(e[0])
                     - float(f[0]))
-                    / ((2*.differential)**2)) * (1/2*differential)
-    third_energy_b = (third_energy_b * (0.529177208)**2)
+                    / ((2*differential)**2)) * (1/2*differential)
+    third_energy_b = (third_energy_b * (0.529177208)**3)
     print(third_energy_b)
+    third_energy_array.append(third_energy_b)
     a.clear()
     b.clear()
     c.clear()
@@ -876,10 +880,10 @@ def third_derivatives_c():
                     + float(f[0])
                     + float(g[0])
                     + float(h[0]))
-                    / (4*(differential**2)))
-                    * (1/2*differential)
+                    / (4*(differential**2))) * (1/2*differential)
 
-    third_energy_c = (third_energy_c * (0.529177208)**2)
+    third_energy_c = (third_energy_c * (0.529177208)**3)
+    third_energy_array.append(third_energy_c)
     print(third_energy_c)
     a.clear()
     b.clear()
@@ -891,6 +895,8 @@ def third_derivatives_c():
     h.clear()
 
 third_geometries()
+
+print(third_energy_array)
 
 import psutil
 process = psutil.Process(os.getpid())
