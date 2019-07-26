@@ -607,6 +607,8 @@ def double_third_terms(zipped,paired,unpaired):
     subprocess.call("rm input*.pbs*", shell=True)
     subprocess.call("rm input*.xml*", shell=True)
 
+
+# Note that coord1 = z, coord2 = y, coord3 = x.
 def triple_third_terms(coord1,coord2,coord3,zipped):
     raw_data[zipped[coord1]] = raw_data[zipped[coord1]] + differential
     raw_data[zipped[coord2]] = raw_data[zipped[coord2]] + differential
@@ -632,9 +634,9 @@ def triple_third_terms(coord1,coord2,coord3,zipped):
     threads(2)
     raw_data[:] = reset[:]
 
-    raw_data[zipped[coord1]] = raw_data[zipped[coord1]] - differential
+    raw_data[zipped[coord1]] = raw_data[zipped[coord1]] + differential
     raw_data[zipped[coord2]] = raw_data[zipped[coord2]] + differential
-    raw_data[zipped[coord3]] = raw_data[zipped[coord3]] + differential
+    raw_data[zipped[coord3]] = raw_data[zipped[coord3]] - differential
 #    print(raw_data)
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp3.txt", data, delimiter=" ", fmt='%s')
@@ -644,9 +646,9 @@ def triple_third_terms(coord1,coord2,coord3,zipped):
     threads(3)
     raw_data[:] = reset[:]
 
-    raw_data[zipped[coord1]] = raw_data[zipped[coord1]] - differential
+    raw_data[zipped[coord1]] = raw_data[zipped[coord1]] + differential
     raw_data[zipped[coord2]] = raw_data[zipped[coord2]] - differential
-    raw_data[zipped[coord3]] = raw_data[zipped[coord3]] + differential
+    raw_data[zipped[coord3]] = raw_data[zipped[coord3]] - differential
 #    print(raw_data)
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp4.txt", data, delimiter=" ", fmt='%s')
@@ -656,9 +658,9 @@ def triple_third_terms(coord1,coord2,coord3,zipped):
     threads(4)
     raw_data[:] = reset[:]
 
-    raw_data[zipped[coord1]] = raw_data[zipped[coord1]] + differential
+    raw_data[zipped[coord1]] = raw_data[zipped[coord1]] - differential
     raw_data[zipped[coord2]] = raw_data[zipped[coord2]] + differential
-    raw_data[zipped[coord3]] = raw_data[zipped[coord3]] - differential
+    raw_data[zipped[coord3]] = raw_data[zipped[coord3]] + differential
 #    print(raw_data)
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp5.txt", data, delimiter=" ", fmt='%s')
@@ -668,9 +670,9 @@ def triple_third_terms(coord1,coord2,coord3,zipped):
     threads(5)
     raw_data[:] = reset[:]
 
-    raw_data[zipped[coord1]] = raw_data[zipped[coord1]] + differential
+    raw_data[zipped[coord1]] = raw_data[zipped[coord1]] - differential
     raw_data[zipped[coord2]] = raw_data[zipped[coord2]] - differential
-    raw_data[zipped[coord3]] = raw_data[zipped[coord3]] - differential
+    raw_data[zipped[coord3]] = raw_data[zipped[coord3]] + differential
 #    print(raw_data)
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp6.txt", data, delimiter=" ", fmt='%s')
