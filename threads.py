@@ -5,6 +5,9 @@ import subprocess
 from threading import Thread
 import time
 
+import psutil
+process = psutil.Process(os.getpid())
+
 differential = 0.005
 global nn
 nn = 1
@@ -905,8 +908,28 @@ def third_derivatives_c():
 
 third_geometries()
 
+def determinethirdsize(size):
+    total_points_tally = []
+
+    size_of_data = size
+    for i in range(1,size_of_data+1,1):
+        for j in range(i):
+            total_points_tally.append(j+1)
+
+    total_points = int(sum(total_points_tally))
+    return total_points//3
+
 print(third_energy_array)
 
-import psutil
-process = psutil.Process(os.getpid())
+np.set_printoptions(suppress=True,
+   formatter={'float_kind':'{:20.10f}'.format})
+
+array = np.reshape(third_energy_array,(determinethirdsize(num_of_jobs),3))
+print(array)
+
+e = open('spectro.in','w+')
+
+#Generalize this.
+np.savetxt('spectro.in',array,header='    3   165',fmt='%20.10f',comments='')
+
 print(process.memory_info()[0])
