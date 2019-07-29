@@ -305,6 +305,8 @@ c = minusplus
 d = negatives
 e = doublepositives
 f = doublenegatives
+g = seven_list
+h = eight_list
 
 # This is for all ways to add two terms together.
 
@@ -317,7 +319,7 @@ doubles = 0
 x_list = 0
 
 print(zero_size)
-"""
+
 #Array generation: these will be edited later to work for larger arrays.
 array = []
 for atom1 in range(size[0]):
@@ -367,6 +369,7 @@ def manipulate_geometry_second(a1,c1,a2,c2):
         gen_pbs("pbs6")
         threads(6)
         nn+=1
+        raw_data[a2,c2] = reset[a2,c2]
 
         run_jobs()
         extract_energy(5)
@@ -452,21 +455,6 @@ def manipulate_geometry_second(a1,c1,a2,c2):
 
 array = array.astype(float)
 print(array.dtype)
-
-#o = [0.00037726010759797646, 1.3377116501089859, 0.7794059200705306, 0.0004889599836133129, 2.4523686801103395, 1.6416705300059675, 0.00037726010759797646, 1.337711640019279, 0.7794059200705306]
-#p = [0.0, 0.0, -0.000109899929157109, 0.0, 0.0, -9.700045211502584e-06, 0.0, 0.0, 0.839248540103199, 0.0, -1.2260569000943633, -0.7274316999428265, 0.0, -0.11139000008597577, -0.1118235799424383, 0.0, -0.9510723099026563, -0.8207080598765515, 0.0, 0.1118235799424383, 0.04156718006242954, 0.0, 0.0, -0.000109899929157109, 0.0, 0.0, 0.0, 0.0, -1.2260569000943633, 0.951072299955058, 0.0, 0.7274316999428265, -0.8207080499289532, 0.0, 0.0, -0.839248540103199]
-
-#for i in range(len(o)):
-#    o[i] = (o[i] * (0.529177208)**2)
-
-#for i in range(len(p)):
-#    p[i] = (p[i] * (0.529177208)**2)
-
-#print(o)
-#print(p)
-
-#element1 = 0
-#element2 = 0
 
 for i in range(shapefour[0]):
     for j in range(shapefour[1]):
@@ -931,5 +919,5 @@ e = open('spectro.in','w+')
 
 #Generalize this.
 np.savetxt('spectro.in',array,header='    3   165',fmt='%20.10f',comments='')
-
+"""
 print(process.memory_info()[0])
