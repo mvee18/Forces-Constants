@@ -245,6 +245,7 @@ def second_derivative_a():
         second_energy = (float(e[i]) - 2*reference + float(f[i])) / ((differential*2)**2)
         e.clear()
         f.clear()
+        print(second_energy)
         second_energy_list_a.append(second_energy)
         return second_energy
 
@@ -256,6 +257,7 @@ def second_derivative_b():
         b.clear()
         c.clear()
         d.clear()
+        print(second_energy_b)
         second_energy_list_b.append(second_energy_b)
         return second_energy_b
 
@@ -879,7 +881,7 @@ def third_derivatives_c():
                     - float(e[0])
                     + float(ff[0])
                     + float(g[0])
-                    + float(h[0]))
+                    - float(h[0]))
                     / (4*(differential**2))) * (1/2*differential)
 
     third_energy_c = (third_energy_c * (0.529177208)**3)
