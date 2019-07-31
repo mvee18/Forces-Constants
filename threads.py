@@ -501,7 +501,6 @@ e = open('spectro.in','w+')
 e.write('    3   18')
 np.savetxt('spectro.in',final,fmt='%20.10f')
 
-"""
 third_list = []
 
 def determine_atom(row,atom_number,item):
@@ -843,8 +842,9 @@ def third_derivatives_a():
     third_energy_a = ((float(a[0])
                     - 3*float(c[0])
                     + 3*float(d[0])
-                    - float(b[0]))
-                    / ((2*differential)**3))
+                    - float(b[0])))
+
+    third_energy_a = third_energy_a * ((2*differential)**3)
     third_energy_a = (third_energy_a * (0.529177208)**3)
     print(third_energy_a)
     third_energy_array.append(third_energy_a)
@@ -860,8 +860,10 @@ def third_derivatives_b():
                     + float(c[0])
                     - float(d[0])
                     + 2*float(e[0])
-                    - float(ff[0]))
-                    / ((2*differential)**2)) * (1/2*differential)
+                    - float(ff[0])))
+
+    third_energy_b = third_energy_b / ((differential*2)**2)
+    third_energy_b = third_energy_b / (differential*2)
     third_energy_b = (third_energy_b * (0.529177208)**3)
     print(third_energy_b)
     third_energy_array.append(third_energy_b)
@@ -881,9 +883,10 @@ def third_derivatives_c():
                     - float(e[0])
                     + float(ff[0])
                     + float(g[0])
-                    - float(h[0]))
-                    / (4*(differential**2))) * (1/2*differential)
+                    - float(h[0])))
 
+    third_energy_c = third_energy_c / (4*(differential**2))
+    third_energy_c = third_energy_c * (1/(2*differential))
     third_energy_c = (third_energy_c * (0.529177208)**3)
     third_energy_array.append(third_energy_c)
     print(third_energy_c)
@@ -921,5 +924,5 @@ e = open('spectro.in','w+')
 
 #Generalize this.
 np.savetxt('spectro.in',array,header='    3   165',fmt='%20.10f',comments='')
-"""
+
 print(process.memory_info()[0])
