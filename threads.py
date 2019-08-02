@@ -131,7 +131,7 @@ def gen_pbs(name):
     f.write("rm -rf $TMPDIR")
 
 def sub_job(args):
-        subprocess.call("mpiexec molpro.exe input%d.com" %args,shell=True)
+    subprocess.call("mpiexec molpro.exe input%d.com" %args,shell=True)
 
 threadslist = []
 
@@ -306,7 +306,7 @@ b = plusminus
 c = minusplus
 d = negatives
 e = doublepositives
-f = doublenegatives
+ff = doublenegatives
 g = seven_list
 h = eight_list
 
@@ -501,23 +501,32 @@ e = open('spectro.in','w+')
 e.write('    3   18')
 np.savetxt('spectro.in',final,fmt='%20.10f')
 
+a = positives
+b = plusminus
+c = minusplus
+d = negatives
+e = doublepositives
+ff = doublenegatives
+g = seven_list
+h = eight_list
+
 third_list = []
 
 def determine_atom(row,atom_number,item):
 
-    if int(third_array[row, atom_number, item]) % 3 == 0:
+    if int(third_array[row, atom_number, item]) // 3 == 0:
         third_array[row,atom_number,item] = 0
-    elif int(third_array[row, atom_number,item]) % 3 == 1:
+    elif int(third_array[row, atom_number,item]) // 3 == 1:
         third_array[row,atom_number,item] = 1
-    elif int(third_array[row,atom_number,item]) % 3 == 2:
+    elif int(third_array[row,atom_number,item]) // 3 == 2:
         third_array[row,atom_number,item] = 2
 
 def determine_coordinate(row,coordinate_number,item):
-    if int(third_array[row, coordinate_number,item]) // 3 == 0:
+    if int(third_array[row, coordinate_number,item]) % 3 == 0:
         third_array[row,coordinate_number,item] = 0
-    elif int(third_array[row, coordinate_number,item]) // 3 == 1:
+    elif int(third_array[row, coordinate_number,item]) % 3 == 1:
         third_array[row,coordinate_number,item] = 1
-    elif int(third_array[row,coordinate_number,item]) // 3 == 2:
+    elif int(third_array[row,coordinate_number,item]) % 3 == 2:
         third_array[row,coordinate_number,item] = 2
 
 def double_third_terms(zipped,paired,unpaired):
@@ -544,7 +553,7 @@ def double_third_terms(zipped,paired,unpaired):
     raw_data[:] = reset[:]
 
     raw_data[zipped[paired]] = raw_data[zipped[paired]] - 2 * differential
-    raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] - differential
+    raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] + differential
 #    print(raw_data)
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp3.txt", data, delimiter=" ", fmt='%s')
@@ -747,9 +756,9 @@ col_list = []
 third_energy_array = []
 
 a = positives
-b = plusminus
+b = negatives
 c = minusplus
-d = negatives
+d = plusminus
 e = doublepositives
 ff = doublenegatives
 g = seven_list
