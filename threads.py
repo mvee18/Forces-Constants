@@ -322,6 +322,7 @@ x_list = 0
 
 print(zero_size)
 
+"""
 #Array generation: these will be edited later to work for larger arrays.
 array = []
 for atom1 in range(size[0]):
@@ -496,10 +497,10 @@ for i in range(shapefour[0]):
 final = np.asarray(final)
 print(final)
 
-e = open('spectro.in','w+')
+e = open('fort.15','w+')
 #Generalize this.
 e.write('    3   18')
-np.savetxt('spectro.in',final,fmt='%20.10f')
+np.savetxt('fort.15',final,fmt='%20.10f')
 
 a = positives
 b = plusminus
@@ -513,7 +514,6 @@ h = eight_list
 third_list = []
 
 def determine_atom(row,atom_number,item):
-
     if int(third_array[row, atom_number, item]) // 3 == 0:
         third_array[row,atom_number,item] = 0
     elif int(third_array[row, atom_number,item]) // 3 == 1:
@@ -929,9 +929,70 @@ np.set_printoptions(suppress=True,
 array = np.reshape(third_energy_array,(determinethirdsize(num_of_jobs),3))
 print(array)
 
-e = open('spectro.in','w+')
+e = open('fort.30','w+')
 
 #Generalize this.
-np.savetxt('spectro.in',array,header='    3   165',fmt='%20.10f',comments='')
+np.savetxt('fort.30',array,header='    3   165',fmt='%20.10f',comments='')
+"""
 
+# Fourth Derivatives.
+
+fourth_list = []
+
+def determine_atom(row,atom_number,item):
+    if int(fourth_array[row, atom_number, item]) // 3 == 0:
+        fourth_array[row,atom_number,item] = 0
+    elif int(fourth_array[row, atom_number,item]) // 3 == 1:
+        fourth_array[row,atom_number,item] = 1
+    elif int(fourth_array[row,atom_number,item]) // 3 == 2:
+        fourth_array[row,atom_number,item] = 2
+
+def determine_coordinate(row,coordinate_number,item):
+    if int(fourth_array[row, coordinate_number,item]) % 3 == 0:
+        fourth_array[row,coordinate_number,item] = 0
+    elif int(fourth_array[row, coordinate_number,item]) % 3 == 1:
+        fourth_array[row,coordinate_number,item] = 1
+    elif int(fourth_array[row,coordinate_number,item]) % 3 == 2:
+        fourth_array[row,coordinate_number,item] = 2
+
+for w in range(num_of_jobs):
+    for x in range(num_of_jobs):
+        for y in range(num_of_jobs):
+            for z in range(num_of_jobs):
+                if x <= w and y <= x and z <= y:
+                    fourth_list.append(((w,w),(x,x),(y,y),(z,z)))
+
+fourth_array = np.asarray(fourth_list)
+
+fourth_array_shape = fourth_array.shape
+print(fourth_array_shape)
+
+for row in range(fourth_array_shape[0]):
+    for col in range(fourth_array_shape[1]):
+        pair = 0
+        if pair == 0:
+            determine_atom(row,col,pair)
+    for col in range(fourth_array_shape[1]):
+        pair = 1
+        if pair == 1:
+            fourth_array[row,col,1] = int(fourth_array[row,col,1])
+            determine_coordinate(row,col,1)
+
+print(fourth_array)
+
+fourth_row_list = []
+fourth_col_list = []
+
+def fourth_geometries():
+    for i in range(fourth_array_shape[0]):
+        for j in range(fourth_array_shape[1]):
+            fourth_row_list.append(fourth_array[i,j,0])
+            fourth_col_list.append(fourth_array[i,j,1])
+        zipped = zip(fourth_row_list,fourth_col_list)
+        zipped = list(zipped)
+        print(zipped)
+        fourth_row_list.clear()
+        fourth_col_list.clear()
+
+fourth_geometries()
 print(process.memory_info()[0])
