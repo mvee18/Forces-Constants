@@ -936,7 +936,6 @@ np.savetxt('fort.30',array,header='    3   165',fmt='%20.10f',comments='')
 """
 
 # Fourth Derivatives.
-
 fourth_list = []
 
 def determine_atom(row,atom_number,item):
@@ -990,7 +989,21 @@ def fourth_geometries():
             fourth_col_list.append(fourth_array[i,j,1])
         zipped = zip(fourth_row_list,fourth_col_list)
         zipped = list(zipped)
-        print(zipped)
+        print(zipped[0],zipped[1],zipped[2],zipped[3])
+        if zipped[0] == zipped[1] and zipped[1] == zipped[2] and zipped[2] == zipped[3]:
+            print("Quadruple Term")
+        elif zipped[0] == zipped[1] and zipped[0] == zipped[2]:
+            print("Triple Term")
+        elif zipped[0] == zipped[1] and zipped[0] == zipped[3]:
+            print("Triple Term")
+        elif zipped[0] == zipped[2] and zipped[0] == zipped[3]:
+            print("Triple Term")
+        elif zipped[1] == zipped[2] and zipped[1] == zipped[3]:
+            print("Triple Term")
+        elif zipped[0] != zipped[1] and zipped[1] != zipped[2] and zipped[2] != zipped[3]:
+            print("Single Term")
+        else:
+            print("Double Term")
         fourth_row_list.clear()
         fourth_col_list.clear()
 
