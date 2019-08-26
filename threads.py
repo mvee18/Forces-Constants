@@ -156,7 +156,7 @@ def extract_energy(numberofinput):
         for line in zzz:
             if "!CCSD(T)-F12b total energy" in line:
                 line = line.split()
-                positives.append(line[3])
+                positives.append(float(line[3]))
                 zz.close()
     elif numberofinput == 2:
         zz = open("input2.out", 'r')
@@ -165,7 +165,7 @@ def extract_energy(numberofinput):
             if "!CCSD(T)-F12b total energy" in line:
 #                Found = True
                 line = line.split()
-                negatives.append(line[3])
+                negatives.append(float(line[3]))
                 zz.close()
 #                if Found = False:
 #                    print(nn)
@@ -175,7 +175,7 @@ def extract_energy(numberofinput):
         for line in zzz:
             if "!CCSD(T)-F12b total energy" in line:
                 line = line.split()
-                minusplus.append(line[3])
+                minusplus.append(float(line[3]))
                 zz.close()
     elif numberofinput == 4:
         zz = open("input4.out", 'r')
@@ -183,7 +183,7 @@ def extract_energy(numberofinput):
         for line in zzz:
             if "!CCSD(T)-F12b total energy" in line:
                 line = line.split()
-                plusminus.append(line[3])
+                plusminus.append(float(line[3]))
                 zz.close()
     elif numberofinput == 5:
         zz = open("input5.out", 'r')
@@ -191,7 +191,7 @@ def extract_energy(numberofinput):
         for line in zzz:
             if "!CCSD(T)-F12b total energy" in line:
                 line = line.split()
-                doublepositives.append(line[3])
+                doublepositives.append(float(line[3]))
                 zz.close()
     elif numberofinput == 6:
         zz = open("input6.out", 'r')
@@ -199,7 +199,7 @@ def extract_energy(numberofinput):
         for line in zzz:
             if "!CCSD(T)-F12b total energy" in line:
                 line = line.split()
-                doublenegatives.append(line[3])
+                doublenegatives.append(float(line[3]))
                 zz.close()
     elif numberofinput == 7:
         zz = open("input7.out", 'r')
@@ -207,7 +207,7 @@ def extract_energy(numberofinput):
         for line in zzz:
             if "!CCSD(T)-F12b total energy" in line:
                 line = line.split()
-                seven_list.append(line[3])
+                seven_list.append(float(line[3]))
                 zz.close()
     elif numberofinput == 8:
         zz = open("input8.out", 'r')
@@ -215,7 +215,7 @@ def extract_energy(numberofinput):
         for line in zzz:
             if "!CCSD(T)-F12b total energy" in line:
                 line = line.split()
-                eight_list.append(line[3])
+                eight_list.append(float(line[3]))
                 zz.close()
 
 positives = []
@@ -982,6 +982,70 @@ print(fourth_array)
 fourth_row_list = []
 fourth_col_list = []
 
+def fourth_quadruple_derivative():
+    print(a,b,c,d,e,f)
+    quadruple_energy = (float(a[0] - 4*b[0] + 6*c[0] - 4*d[0] + e[0]))
+    print(quadruple_energy)
+
+def fourth_quadruple(zipped):
+    raw_data[zipped[0]] = raw_data[zipped[0]] + 4 * differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp.txt")
+    gen_pbs("pbs1")
+    threads(1)
+    raw_data[:] = reset[:]
+
+    raw_data[zipped[0]] = raw_data[zipped[0]] + 2 * differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp2.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp2.txt")
+    gen_pbs("pbs2")
+    threads(2)
+    raw_data[:] = reset[:]
+
+    raw_data[zipped[0]] = raw_data[zipped[0]]
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp3.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp3.txt")
+    gen_pbs("pbs3")
+    threads(3)
+    raw_data[:] = reset[:]
+
+    raw_data[zipped[0]] = raw_data[zipped[0]] - 2 * differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp4.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp4.txt")
+    gen_pbs("pbs4")
+    threads(4)
+    raw_data[:] = reset[:]
+
+    raw_data[zipped[0]] = raw_data[zipped[0]] - 4 * differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp5.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp5.txt")
+    gen_pbs("pbs5")
+    threads(5)
+    raw_data[:] = reset[:]
+
+    run_jobs()
+    extract_energy(1)
+    extract_energy(2)
+    extract_energy(3)
+    extract_energy(4)
+    extract_energy(5)
+
+    fourth_quadruple_derivative()
+    subprocess.call("rm input*.com*", shell=True)
+    subprocess.call("rm input*.out*", shell=True)
+    subprocess.call("rm input*.pbs*", shell=True)
+    subprocess.call("rm input*.xml*", shell=True)
+
 def fourth_geometries():
     for i in range(fourth_array_shape[0]):
         for j in range(fourth_array_shape[1]):
@@ -992,6 +1056,7 @@ def fourth_geometries():
         print(zipped[0],zipped[1],zipped[2],zipped[3])
         if zipped[0] == zipped[1] and zipped[1] == zipped[2] and zipped[2] == zipped[3]:
             print("Quadruple Term")
+            fourth_quadruple(zipped)
         elif zipped[0] == zipped[1] and zipped[0] == zipped[2]:
             print("Triple Term")
         elif zipped[0] == zipped[1] and zipped[0] == zipped[3]:
