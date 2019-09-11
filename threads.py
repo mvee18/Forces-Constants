@@ -12,6 +12,8 @@ differential = 0.005
 global nn
 nn = 1
 
+#Please remove all the lists that you don't need at some point so you can get rid of a ton of float().
+
 reset = np.genfromtxt('geom.xyz', skip_header=1, usecols=(1,2,3))
 raw_data = np.genfromtxt('geom.xyz', skip_header=1, usecols=(1,2,3))
 labels = np.genfromtxt('geom.xyz', skip_header=1, dtype=str, usecols=0)
@@ -55,6 +57,14 @@ def gen_com(name):
         f = open("input7.com", 'w+')
     elif filename == "tmp8.txt":
         f = open("input8.com", 'w+')
+    elif filename == "tmp9.txt":
+        f = open("input9.com", 'w+')
+    elif filename == "tmp10.txt":
+        f = open("input10.com", 'w+')
+    elif filename == "tmp11.txt":
+        f = open("input11.com", 'w+')
+    elif filename == "tmp12.txt":
+        f = open("input12.com", 'w+')
     f.write("memory,%d,m\n" %memory_list[0])
     f.write("gthresh,energy=1.d-12,zero=1.d-22,oneint=1.d-22,twoint=1.d-22;\n")
 #            gthresh,optgrad=1.d-8,optstep=1.d-8;
@@ -216,6 +226,38 @@ def extract_energy(numberofinput):
             if "!CCSD(T)-F12b total energy" in line:
                 line = line.split()
                 eight_list.append(float(line[3]))
+                zz.close()
+    elif numberofinput == 9:
+        zz = open("input9.out", 'r')
+        zzz = zz.readlines()
+        for line in zzz:
+            if "!CCSD(T)-F12b total energy" in line:
+                line = line.split()
+                nine_list.append(float(line[3]))
+                zz.close()
+    elif numberofinput == 10:
+        zz = open("input10.out", 'r')
+        zzz = zz.readlines()
+        for line in zzz:
+            if "!CCSD(T)-F12b total energy" in line:
+                line = line.split()
+                ten_list.append(float(line[3]))
+                zz.close()
+    elif numberofinput == 11:
+        zz = open("input11.out", 'r')
+        zzz = zz.readlines()
+        for line in zzz:
+            if "!CCSD(T)-F12b total energy" in line:
+                line = line.split()
+                eleven_list.append(float(line[3]))
+                zz.close()
+    elif numberofinput == 12:
+        zz = open("input12.out", 'r')
+        zzz = zz.readlines()
+        for line in zzz:
+            if "!CCSD(T)-F12b total energy" in line:
+                line = line.split()
+                twelve_list.append(float(line[3]))
                 zz.close()
 
 positives = []
@@ -754,6 +796,7 @@ row_list = []
 col_list = []
 
 third_energy_array = []
+"""
 
 a = positives
 b = negatives
@@ -764,6 +807,7 @@ ff = doublenegatives
 g = seven_list
 h = eight_list
 
+"""
 def third_geometries():
     for i in range(third_array_shape[0]):
         for j in range(third_array_shape[1]):
@@ -934,6 +978,18 @@ e = open('fort.30','w+')
 #Generalize this.
 np.savetxt('fort.30',array,header='    3   165',fmt='%20.10f',comments='')
 """
+a = positives
+b = negatives
+c = minusplus
+d = plusminus
+e = doublepositives
+ff = doublenegatives
+g = seven_list
+h = eight_list
+ii = nine_list
+jj = ten_list
+kk = eleven_list
+ll = twelve_list
 
 # Fourth Derivatives.
 fourth_list = []
@@ -1046,6 +1102,212 @@ def fourth_quadruple(zipped):
     subprocess.call("rm input*.pbs*", shell=True)
     subprocess.call("rm input*.xml*", shell=True)
 
+def fourth_triple_derivative():
+    return False
+
+def fourth_triple(zipped, paired, unpaired):
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] + 3 * differential
+    raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] + differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp.txt")
+    gen_pbs("pbs1")
+    threads(1)
+    raw_data[:] = reset[:]
+
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] + differential
+    raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] + differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp2.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp2.txt")
+    gen_pbs("pbs2")
+    threads(2)
+    raw_data[:] = reset[:]
+
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] - differential
+    raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] + differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp3.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp3.txt")
+    gen_pbs("pbs3")
+    threads(3)
+    raw_data[:] = reset[:]
+
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] - 3 * differential
+    raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] +  differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp4.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp4.txt")
+    gen_pbs("pbs4")
+    threads(4)
+    raw_data[:] = reset[:]
+
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] + 3 * differential
+    raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] -  differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp5.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp5.txt")
+    gen_pbs("pbs5")
+    threads(5)
+    raw_data[:] = reset[:]
+
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] + 3 * differential
+    raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] -  differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp6.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp6.txt")
+    gen_pbs("pbs6")
+    threads(6)
+    raw_data[:] = reset[:]
+
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] + 3 * differential
+    raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] -  differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp7.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp7.txt")
+    gen_pbs("pbs7")
+    threads(7)
+    raw_data[:] = reset[:]
+
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] + 3 * differential
+    raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] -  differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp8.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp8.txt")
+    gen_pbs("pbs8")
+    threads(8)
+    raw_data[:] = reset[:]
+
+    run_jobs()
+    extract_energy(1)
+    extract_energy(2)
+    extract_energy(3)
+    extract_energy(4)
+    extract_energy(5)
+    extract_energy(6)
+    extract_energy(7)
+    extract_energy(8)
+
+    fourth_triple_derivative()
+    subprocess.call("rm input*.com*", shell=True)
+    subprocess.call("rm input*.out*", shell=True)
+    subprocess.call("rm input*.pbs*", shell=True)
+    subprocess.call("rm input*.xml*", shell=True)
+
+def fourth_pairs_derivative():
+    return False
+
+def fourth_pairs(zipped,pair1,pair2):
+    #(+2x,+2y)
+    raw_data[zipped[pair1]] = raw_data[zipped[pair1]] + 2 * differential
+    raw_data[zipped[pair2]] = raw_data[zipped[pair2]] + 2 * differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp.txt")
+    gen_pbs("pbs1")
+    threads(1)
+    raw_data[:] = reset[:]
+
+# (-2x,-2y)
+    raw_data[zipped[pair1]] = raw_data[zipped[pair1]] - 2 * differential
+    raw_data[zipped[pair2]] = raw_data[zipped[pair2]] - 2 * differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp2.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp2.txt")
+    gen_pbs("pbs2")
+    threads(2)
+    raw_data[:] = reset[:]
+
+# (-2x,+2y)
+    raw_data[zipped[pair1]] = raw_data[zipped[pair1]] - 2 * differential
+    raw_data[zipped[pair2]] = raw_data[zipped[pair2]] + 2 * differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp3.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp3.txt")
+    gen_pbs("pbs3")
+    threads(3)
+    raw_data[:] = reset[:]
+
+# (+2x,-2y)
+    raw_data[zipped[pair1]] = raw_data[zipped[pair1]] + 2 * differential
+    raw_data[zipped[pair2]] = raw_data[zipped[pair2]] - 2 * differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp4.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp4.txt")
+    gen_pbs("pbs4")
+    threads(4)
+    raw_data[:] = reset[:]
+
+# (+2x)
+    raw_data[zipped[pair1]] = raw_data[zipped[pair1]] + 2 * differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp5.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp5.txt")
+    gen_pbs("pbs5")
+    threads(5)
+    raw_data[:] = reset[:]
+
+# (+2y)
+    raw_data[zipped[pair2]] = raw_data[zipped[pair2]] + 2 * differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp6.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp6.txt")
+    gen_pbs("pbs6")
+    threads(6)
+    raw_data[:] = reset[:]
+
+# (-2x)
+    raw_data[zipped[pair1]] = raw_data[zipped[pair1]] - 2 * differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp7.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp7.txt")
+    gen_pbs("pbs7")
+    threads(7)
+    raw_data[:] = reset[:]
+
+# (-2y)
+    raw_data[zipped[pair2]] = raw_data[zipped[pair2]] - 2 * differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp8.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp8.txt")
+    gen_pbs("pbs8")
+    threads(8)
+    raw_data[:] = reset[:]
+
+# last term is reference energy (E(0)).
+
+    run_jobs()
+    extract_energy(1)
+    extract_energy(2)
+    extract_energy(3)
+    extract_energy(4)
+    extract_energy(5)
+    extract_energy(6)
+    extract_energy(7)
+    extract_energy(8)
+
+    fourth_pairs_derivative()
+    subprocess.call("rm input*.com*", shell=True)
+    subprocess.call("rm input*.out*", shell=True)
+    subprocess.call("rm input*.pbs*", shell=True)
+    subprocess.call("rm input*.xml*", shell=True)
+
 def fourth_geometries():
     for i in range(fourth_array_shape[0]):
         for j in range(fourth_array_shape[1]):
@@ -1059,14 +1321,19 @@ def fourth_geometries():
             fourth_quadruple(zipped)
         elif zipped[0] == zipped[1] and zipped[0] == zipped[2]:
             print("Triple Term")
+            fourth_triple(zipped,0,3)
         elif zipped[0] == zipped[1] and zipped[0] == zipped[3]:
             print("Triple Term")
+            fourth_triple(zipped,0,2)
         elif zipped[0] == zipped[2] and zipped[0] == zipped[3]:
             print("Triple Term")
+            fourth_triple(zipped,0,1)
         elif zipped[1] == zipped[2] and zipped[1] == zipped[3]:
             print("Triple Term")
-        elif zipped[0] != zipped[1] and zipped[1] != zipped[2] and zipped[2] != zipped[3]:
+            fourth_triple(zipped,1,0)
+        elif zipped[0] == zipped[1] and zipped[2] == zipped[3]:
             print("Single Term")
+            fourth_pairs(zipped,0,2)
         else:
             print("Double Term")
         fourth_row_list.clear()
