@@ -1039,8 +1039,8 @@ fourth_row_list = []
 fourth_col_list = []
 
 def fourth_quadruple_derivative():
-    print(a,b,c,d,e,f)
-    quadruple_energy = (float(a[0] - 4*b[0] + 6*c[0] - 4*d[0] + e[0]))
+    print(a,b,c,d,e)
+    quadruple_energy = (float(a[0] - 4*b[0] + 6*c[0] - 4*d[0] + e[0]))/((2*differential)**4)
     print(quadruple_energy)
 
 def fourth_quadruple(zipped):
@@ -1103,7 +1103,14 @@ def fourth_quadruple(zipped):
     subprocess.call("rm input*.xml*", shell=True)
 
 def fourth_triple_derivative():
-    return False
+    quadruple_energy_2 = ((float(a[0])
+                        -3*float(b[0])
+                        +3*float(c[0])
+                        -float(d[0])
+                        -float(e[0])
+                        +3*float(f[0])
+                        -3*float(g[0])
+                        +float(h[0]))/((16*differential**4))
 
 def fourth_triple(zipped, paired, unpaired):
     raw_data[zipped[paired]] = raw_data[zipped[paired]] + 3 * differential
@@ -1156,7 +1163,7 @@ def fourth_triple(zipped, paired, unpaired):
     threads(5)
     raw_data[:] = reset[:]
 
-    raw_data[zipped[paired]] = raw_data[zipped[paired]] + 3 * differential
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] + differential
     raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] -  differential
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp6.txt", data, delimiter=" ", fmt='%s')
@@ -1166,7 +1173,7 @@ def fourth_triple(zipped, paired, unpaired):
     threads(6)
     raw_data[:] = reset[:]
 
-    raw_data[zipped[paired]] = raw_data[zipped[paired]] + 3 * differential
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] - differential
     raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] -  differential
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp7.txt", data, delimiter=" ", fmt='%s')
@@ -1176,7 +1183,7 @@ def fourth_triple(zipped, paired, unpaired):
     threads(7)
     raw_data[:] = reset[:]
 
-    raw_data[zipped[paired]] = raw_data[zipped[paired]] + 3 * differential
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] - 3 * differential
     raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] -  differential
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp8.txt", data, delimiter=" ", fmt='%s')
