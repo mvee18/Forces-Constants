@@ -1154,7 +1154,7 @@ def fourth_triple(zipped, paired, unpaired):
     raw_data[:] = reset[:]
 
     raw_data[zipped[paired]] = raw_data[zipped[paired]] + 3 * differential
-    raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] -  differential
+    raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] - differential
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp5.txt", data, delimiter=" ", fmt='%s')
     print(data)
