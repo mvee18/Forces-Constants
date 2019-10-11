@@ -268,6 +268,10 @@ doublepositives = []
 doublenegatives = []
 seven_list = []
 eight_list = []
+nine_list = []
+ten_list = []
+eleven_list = []
+twelve_list = []
 
 # First derivatives.
 # Could speed this up by removing the iterator, since there is no longer more than one item in the list.
@@ -286,7 +290,7 @@ def second_derivative_a():
     for i in range(len(e)):
         second_energy = (float(e[i]) - 2*reference + float(f[i])) / ((differential*2)**2)
         e.clear()
-        f.clear()
+        ff.clear()
         print(second_energy)
         second_energy_list_a.append(second_energy)
         return second_energy
@@ -294,7 +298,7 @@ def second_derivative_a():
 # More complicated second derivatives:
 def second_derivative_b():
     for i in range(len(a)):
-        second_energy_b = (float(a[i]) - float(b[i]) - float(c[i]) + float(d[i]))/(4*(differential**2))
+        second_energy_b = ((float(a[i]) - float(b[i]) - float(c[i]) + float(d[i]))/(4*(differential**2)))
         a.clear()
         b.clear()
         c.clear()
@@ -1102,6 +1106,7 @@ def fourth_quadruple(zipped):
     subprocess.call("rm input*.pbs*", shell=True)
     subprocess.call("rm input*.xml*", shell=True)
 
+
 def fourth_triple_derivative():
     quadruple_energy_2 = ((float(a[0])
                         -3*float(b[0])
@@ -1110,7 +1115,7 @@ def fourth_triple_derivative():
                         -float(e[0])
                         +3*float(f[0])
                         -3*float(g[0])
-                        +float(h[0]))/((16*differential**4))
+                        +float(h[0]))/((16*differential**4)))
 
 def fourth_triple(zipped, paired, unpaired):
     raw_data[zipped[paired]] = raw_data[zipped[paired]] + 3 * differential
@@ -1144,7 +1149,7 @@ def fourth_triple(zipped, paired, unpaired):
     raw_data[:] = reset[:]
 
     raw_data[zipped[paired]] = raw_data[zipped[paired]] - 3 * differential
-    raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] +  differential
+    raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] + differential
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp4.txt", data, delimiter=" ", fmt='%s')
     print(data)
@@ -1164,7 +1169,7 @@ def fourth_triple(zipped, paired, unpaired):
     raw_data[:] = reset[:]
 
     raw_data[zipped[paired]] = raw_data[zipped[paired]] + differential
-    raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] -  differential
+    raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] - differential
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp6.txt", data, delimiter=" ", fmt='%s')
     print(data)
@@ -1184,7 +1189,7 @@ def fourth_triple(zipped, paired, unpaired):
     raw_data[:] = reset[:]
 
     raw_data[zipped[paired]] = raw_data[zipped[paired]] - 3 * differential
-    raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] -  differential
+    raw_data[zipped[unpaired]] = raw_data[zipped[unpaired]] - differential
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp8.txt", data, delimiter=" ", fmt='%s')
     print(data)
@@ -1210,7 +1215,8 @@ def fourth_triple(zipped, paired, unpaired):
     subprocess.call("rm input*.xml*", shell=True)
 
 def fourth_pairs_derivative():
-    return False
+    fourth_pair_energy = (1/16*reference**4)*(a[0]+b[0]+c[0]+d[0]-2*e[0]-2*ff[0]-2*g[0]-2*h[0]+4*reference)
+    print(fourth_pair_energy)
 
 def fourth_pairs(zipped,pair1,pair2):
     #(+2x,+2y)
@@ -1315,6 +1321,11 @@ def fourth_pairs(zipped,pair1,pair2):
     subprocess.call("rm input*.pbs*", shell=True)
     subprocess.call("rm input*.xml*", shell=True)
 
+def fourth_doubles(paired,unpaired1,unpaired2):
+    return False
+
+
+
 def fourth_geometries():
     for i in range(fourth_array_shape[0]):
         for j in range(fourth_array_shape[1]):
@@ -1325,26 +1336,43 @@ def fourth_geometries():
         print(zipped[0],zipped[1],zipped[2],zipped[3])
         if zipped[0] == zipped[1] and zipped[1] == zipped[2] and zipped[2] == zipped[3]:
             print("Quadruple Term")
-            fourth_quadruple(zipped)
+#            fourth_quadruple(zipped)
         elif zipped[0] == zipped[1] and zipped[0] == zipped[2]:
             print("Triple Term")
-            fourth_triple(zipped,0,3)
+#            fourth_triple(zipped,0,3)
         elif zipped[0] == zipped[1] and zipped[0] == zipped[3]:
             print("Triple Term")
-            fourth_triple(zipped,0,2)
+#            fourth_triple(zipped,0,2)
         elif zipped[0] == zipped[2] and zipped[0] == zipped[3]:
             print("Triple Term")
-            fourth_triple(zipped,0,1)
+#            fourth_triple(zipped,0,1)
         elif zipped[1] == zipped[2] and zipped[1] == zipped[3]:
             print("Triple Term")
-            fourth_triple(zipped,1,0)
+#            fourth_triple(zipped,1,0)
         elif zipped[0] == zipped[1] and zipped[2] == zipped[3]:
-            print("Single Term")
-            fourth_pairs(zipped,0,2)
-        else:
+            print("Paired Term")
+#            fourth_pairs(zipped,0,2)
+        elif zipped[0] == zipped[3] and zipped[1] == zipped[2]:
+#            fourth_pairs(zipped,0,1)
+            print("Paired Term")
+        elif zipped[0] == zipped[1]:
             print("Double Term")
+        elif zipped[0] == zipped[2]:
+            print("Double Term")
+        elif zipped[0] == zipped[3]:
+            print("Double Term")
+        elif zipped[1] == zipped[2]:
+            print("Double Term")
+        elif zipped[1] == zipped[3]:
+            print("Double Term")
+        elif zipped[2] == zipped[3]:
+            print("Double Term")
+        else:
+            print("Unclassified?")
+
         fourth_row_list.clear()
         fourth_col_list.clear()
 
 fourth_geometries()
+
 print(process.memory_info()[0])
