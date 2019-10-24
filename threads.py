@@ -32,6 +32,7 @@ for line in yyy:
     if "!CCSD(T)-F12b total energy" in line:
         line = line.split()
         reference = float(line[3])
+        reference = round(reference,8)
 """
 def save_and_gen(args):
     np.savetxt("tmp.txt", data, delimiter=" ", fmt='%s')
@@ -65,9 +66,18 @@ def gen_com(name):
         f = open("input11.com", 'w+')
     elif filename == "tmp12.txt":
         f = open("input12.com", 'w+')
+    elif filename == "tmp13.txt":
+        f = open("input13.com", 'w+')
+    elif filename == "tmp14.txt":
+        f = open("input14.com", 'w+')
+    elif filename == "tmp15.txt":
+        f = open("input15.com", 'w+')
+    elif filename == "tmp16.txt":
+        f = open("input16.com", 'w+')
+
     f.write("memory,%d,m\n" %memory_list[0])
     f.write("gthresh,energy=1.d-12,zero=1.d-22,oneint=1.d-22,twoint=1.d-22;\n")
-#            gthresh,optgrad=1.d-8,optstep=1.d-8;
+    f.write("gthresh,optgrad=1.d-8,optstep=1.d-8;")
     f.write("\nnocompress;\n")
     f.write("geomtyp=xyz\n")
     f.write("angstrom\n")
@@ -79,11 +89,12 @@ def gen_com(name):
     f.write("set,charge=0\n")
     f.write("set,spin=0\n")
     f.write("{hf;accu,20;}\n")
-    f.write("{CCSD(T)-F12}")
+    f.write("{CCSD(T)-F12,nocheck,maxit=250;orbital,IGNORE_ERROR;}}")
     f.close()
     temp.close()
     subprocess.call("rm tmp*.txt", shell=True)
 
+"""
 def gen_pbs(name):
     filename = name
     if filename == "pbs1":
@@ -139,6 +150,7 @@ def gen_pbs(name):
     f.write("date\n\n")
 
     f.write("rm -rf $TMPDIR")
+"""
 
 def sub_job(args):
     subprocess.call("mpiexec molpro.exe input%d.com" %args,shell=True)
@@ -159,14 +171,17 @@ def run_jobs():
         time.sleep(1)
     threadslist.clear()
 
-def extract_energy(numberofinput):
+def extract_energy(numberofinput,derivative):
     if numberofinput == 1:
         zz = open("input1.out", 'r')
         zzz = zz.readlines()
         for line in zzz:
             if "!CCSD(T)-F12b total energy" in line:
                 line = line.split()
-                positives.append(float(line[3]))
+                if derivative != 4:
+                    positives.append(float(line[3]))
+                elif derivative == 4:
+                    fourth_templist.append(float(line[3]))
                 zz.close()
     elif numberofinput == 2:
         zz = open("input2.out", 'r')
@@ -175,7 +190,10 @@ def extract_energy(numberofinput):
             if "!CCSD(T)-F12b total energy" in line:
 #                Found = True
                 line = line.split()
-                negatives.append(float(line[3]))
+                if derivative != 4:
+                    negatives.append(float(line[3]))
+                elif derivative == 4:
+                    fourth_templist.append(float(line[3]))
                 zz.close()
 #                if Found = False:
 #                    print(nn)
@@ -185,7 +203,10 @@ def extract_energy(numberofinput):
         for line in zzz:
             if "!CCSD(T)-F12b total energy" in line:
                 line = line.split()
-                minusplus.append(float(line[3]))
+                if derivative != 4:
+                    minusplus.append(float(line[3]))
+                elif derivative == 4:
+                    fourth_templist.append(float(line[3]))
                 zz.close()
     elif numberofinput == 4:
         zz = open("input4.out", 'r')
@@ -193,7 +214,10 @@ def extract_energy(numberofinput):
         for line in zzz:
             if "!CCSD(T)-F12b total energy" in line:
                 line = line.split()
-                plusminus.append(float(line[3]))
+                if derivative != 4:
+                    plusminus.append(float(line[3]))
+                elif derivative == 4:
+                    fourth_templist.append(float(line[3]))
                 zz.close()
     elif numberofinput == 5:
         zz = open("input5.out", 'r')
@@ -201,7 +225,10 @@ def extract_energy(numberofinput):
         for line in zzz:
             if "!CCSD(T)-F12b total energy" in line:
                 line = line.split()
-                doublepositives.append(float(line[3]))
+                if derivative != 4:
+                    doublepositives.append(float(line[3]))
+                elif derivative == 4:
+                    fourth_templist.append(float(line[3]))
                 zz.close()
     elif numberofinput == 6:
         zz = open("input6.out", 'r')
@@ -209,7 +236,10 @@ def extract_energy(numberofinput):
         for line in zzz:
             if "!CCSD(T)-F12b total energy" in line:
                 line = line.split()
-                doublenegatives.append(float(line[3]))
+                if derivative != 4:
+                    doublenegatives.append(float(line[3]))
+                elif derivative == 4:
+                    fourth_templist.append(float(line[3]))
                 zz.close()
     elif numberofinput == 7:
         zz = open("input7.out", 'r')
@@ -217,7 +247,10 @@ def extract_energy(numberofinput):
         for line in zzz:
             if "!CCSD(T)-F12b total energy" in line:
                 line = line.split()
-                seven_list.append(float(line[3]))
+                if derivative != 4:
+                    seven_list.append(float(line[3]))
+                elif derivative == 4:
+                    fourth_templist.append(float(line[3]))
                 zz.close()
     elif numberofinput == 8:
         zz = open("input8.out", 'r')
@@ -225,7 +258,10 @@ def extract_energy(numberofinput):
         for line in zzz:
             if "!CCSD(T)-F12b total energy" in line:
                 line = line.split()
-                eight_list.append(float(line[3]))
+                if derivative != 4:
+                    eight_list.append(float(line[3]))
+                elif derivative == 4:
+                    fourth_templist.append(float(line[3]))
                 zz.close()
     elif numberofinput == 9:
         zz = open("input9.out", 'r')
@@ -233,7 +269,10 @@ def extract_energy(numberofinput):
         for line in zzz:
             if "!CCSD(T)-F12b total energy" in line:
                 line = line.split()
-                nine_list.append(float(line[3]))
+                if derivative != 4:
+                    nine_list.append(float(line[3]))
+                elif derivative == 4:
+                    fourth_templist.append(float(line[3]))
                 zz.close()
     elif numberofinput == 10:
         zz = open("input10.out", 'r')
@@ -241,7 +280,10 @@ def extract_energy(numberofinput):
         for line in zzz:
             if "!CCSD(T)-F12b total energy" in line:
                 line = line.split()
-                ten_list.append(float(line[3]))
+                if derivative != 4:
+                    ten_list.append(float(line[3]))
+                elif derivative == 4:
+                    fourth_templist.append(float(line[3]))
                 zz.close()
     elif numberofinput == 11:
         zz = open("input11.out", 'r')
@@ -249,7 +291,10 @@ def extract_energy(numberofinput):
         for line in zzz:
             if "!CCSD(T)-F12b total energy" in line:
                 line = line.split()
-                eleven_list.append(float(line[3]))
+                if derivative != 4:
+                    eleven_list.append(float(line[3]))
+                elif derivative == 4:
+                    fourth_templist.append(float(line[3]))
                 zz.close()
     elif numberofinput == 12:
         zz = open("input12.out", 'r')
@@ -257,7 +302,42 @@ def extract_energy(numberofinput):
         for line in zzz:
             if "!CCSD(T)-F12b total energy" in line:
                 line = line.split()
-                twelve_list.append(float(line[3]))
+                if derivative != 4:
+                    twelve_list.append(float(line[3]))
+                elif derivative == 4:
+                    fourth_templist.append(float(line[3]))
+                zz.close()
+    elif numberofinput == 13:
+        zz = open("input13.out", 'r')
+        zzz = zz.readlines()
+        for line in zzz:
+            if "!CCSD(T)-F12b total energy" in line:
+                line = line.split()
+                fourth_templist.append(float(line[3]))
+                zz.close()
+    elif numberofinput == 14:
+        zz = open("input14.out", 'r')
+        zzz = zz.readlines()
+        for line in zzz:
+            if "!CCSD(T)-F12b total energy" in line:
+                line = line.split()
+                fourth_templist.append(float(line[3]))
+                zz.close()
+    elif numberofinput == 15:
+        zz = open("input12.out", 'r')
+        zzz = zz.readlines()
+        for line in zzz:
+            if "!CCSD(T)-F12b total energy" in line:
+                line = line.split()
+                fourth_templist.append(float(line[3]))
+                zz.close()
+    elif numberofinput == 16:
+        zz = open("input12.out", 'r')
+        zzz = zz.readlines()
+        for line in zzz:
+            if "!CCSD(T)-F12b total energy" in line:
+                line = line.split()
+                fourth_templist.append(float(line[3]))
                 zz.close()
 
 positives = []
@@ -288,6 +368,8 @@ second_energy_list_b = []
 # Could speed this up by removing the iterator, since there is no longer more than one item in the list.
 def second_derivative_a():
     for i in range(len(e)):
+        e[0] = round(float(e[0],8))
+        f[0] = round(float(f[0],8))
         second_energy = (float(e[i]) - 2*reference + float(f[i])) / ((differential*2)**2)
         e.clear()
         ff.clear()
@@ -298,7 +380,11 @@ def second_derivative_a():
 # More complicated second derivatives:
 def second_derivative_b():
     for i in range(len(a)):
-        second_energy_b = ((float(a[i]) - float(b[i]) - float(c[i]) + float(d[i]))/(4*(differential**2)))
+        a[0] = round(float(a[0],8))
+        b[0] = round(float(b[0],8))
+        c[0] = round(float(c[0],8))
+        d[0] = round(float(d[0],8))
+        second_energy_b = ((float(a[i]) - float(c[i]) - float(d[i]) + float(b[i]))/(4*(differential**2)))
         a.clear()
         b.clear()
         c.clear()
@@ -348,9 +434,9 @@ negatives.clear()
 
 # Redefine lists to help me understand.
 a = positives
-b = plusminus
+b = negatives
 c = minusplus
-d = negatives
+d = plusminus
 e = doublepositives
 ff = doublenegatives
 g = seven_list
@@ -1045,6 +1131,7 @@ fourth_col_list = []
 def fourth_quadruple_derivative():
     print(a,b,c,d,e)
     quadruple_energy = (float(a[0] - 4*b[0] + 6*c[0] - 4*d[0] + e[0]))/((2*differential)**4)
+    quadruple_energy = (quadruple_energy * (0.529177208)**4)
     print(quadruple_energy)
 
 def fourth_quadruple(zipped):
@@ -1108,7 +1195,7 @@ def fourth_quadruple(zipped):
 
 
 def fourth_triple_derivative():
-    quadruple_energy_2 = ((float(a[0])
+    fourth_triple_energy = ((float(a[0])
                         -3*float(b[0])
                         +3*float(c[0])
                         -float(d[0])
@@ -1116,6 +1203,8 @@ def fourth_triple_derivative():
                         +3*float(f[0])
                         -3*float(g[0])
                         +float(h[0]))/((16*differential**4)))
+    fourth_triple_energy = (fourth_triple_energy * (0.529177208)**4)
+    print(fourth_triple_energy)
 
 def fourth_triple(zipped, paired, unpaired):
     raw_data[zipped[paired]] = raw_data[zipped[paired]] + 3 * differential
@@ -1216,6 +1305,7 @@ def fourth_triple(zipped, paired, unpaired):
 
 def fourth_pairs_derivative():
     fourth_pair_energy = (1/16*reference**4)*(a[0]+b[0]+c[0]+d[0]-2*e[0]-2*ff[0]-2*g[0]-2*h[0]+4*reference)
+    fourth_pair_energy = (fourth_pair_energy * (0.529177208)**4)
     print(fourth_pair_energy)
 
 def fourth_pairs(zipped,pair1,pair2):
@@ -1321,10 +1411,372 @@ def fourth_pairs(zipped,pair1,pair2):
     subprocess.call("rm input*.pbs*", shell=True)
     subprocess.call("rm input*.xml*", shell=True)
 
+fourth_templist = []
+zed = fourth_templist
+
+def fourth_doubles_derivative():
+    fourth_double_E = ((zed[0]
+                    - 2*zed[1]
+                    + zed[2]
+                    - zed[3]
+                    + 2*zed[4]
+                    - zed[5]
+                    - zed[6]
+                    + 2*zed[7]
+                    - zed[8]
+                    + zed[9]
+                    - 2*zed[10]
+                    + zed[11]))
+    fourth_doubles_E = (fourth_double_E * (0.529177208)**4)
+    print(fourth_double_E)
+
 def fourth_doubles(paired,unpaired1,unpaired2):
-    return False
+#(+2x,+y,+z)
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] + 2 * differential
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] + differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] + differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp.txt")
+    gen_pbs("pbs1")
+    threads(1)
+    raw_data[:] = reset[:]
 
+# (0,+y,+z)
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] + differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] + differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp2.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp2.txt")
+    gen_pbs("pbs2")
+    threads(2)
+    raw_data[:] = reset[:]
 
+# (-2x,+y,+z)
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] - 2 * differential
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] + differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] + differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp3.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp3.txt")
+    gen_pbs("pbs3")
+    threads(3)
+    raw_data[:] = reset[:]
+
+# (+2x,-y,+z)
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] + 2 * differential
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] - differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] + differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp4.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp4.txt")
+    gen_pbs("pbs4")
+    threads(4)
+    raw_data[:] = reset[:]
+
+# (0,-y,+z)
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] - differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] + differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp5.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp5.txt")
+    gen_pbs("pbs5")
+    threads(5)
+    raw_data[:] = reset[:]
+
+# (-2x,-y,+z)
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] - 2 * differential
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] - differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] + differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp6.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp6.txt")
+    gen_pbs("pbs6")
+    threads(6)
+    raw_data[:] = reset[:]
+
+# (+2x,+y,-z)
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] + 2 * differential
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] + differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp7.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp7.txt")
+    gen_pbs("pbs7")
+    threads(7)
+    raw_data[:] = reset[:]
+
+# (0,+y,-z)
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] + differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp8.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp8.txt")
+    gen_pbs("pbs8")
+    threads(8)
+    raw_data[:] = reset[:]
+
+# (-2x,+y,-z)
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] - 2 * differential
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] + differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp9.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp9.txt")
+    gen_pbs("pbs9")
+    threads(9)
+    raw_data[:] = reset[:]
+
+# (+2x,-y,-z)
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] + 2 * differential
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] - differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp10.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp10.txt")
+    gen_pbs("pbs10")
+    threads(10)
+    raw_data[:] = reset[:]
+
+# (0,-y,-z)
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] - differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp11.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp11.txt")
+    gen_pbs("pbs11")
+    threads(11)
+    raw_data[:] = reset[:]
+
+# (-2x,-y,-z)
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] - 2 * differential
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] - differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp12.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp12.txt")
+    gen_pbs("pbs12")
+    threads(12)
+    raw_data[:] = reset[:]
+
+    run_jobs()
+    extract_energy(1)
+    extract_energy(2)
+    extract_energy(3)
+    extract_energy(4)
+    extract_energy(5)
+    extract_energy(6)
+    extract_energy(7)
+    extract_energy(8)
+    extract_energy(9)
+    extract_energy(10)
+    extract_energy(11)
+    extract_energy(12)
+
+    fourth_doubles_derivative()
+    subprocess.call("rm input*.com*", shell=True)
+    subprocess.call("rm input*.out*", shell=True)
+    subprocess.call("rm input*.pbs*", shell=True)
+    subprocess.call("rm input*.xml*", shell=True)
+
+def fourth_singles(zipped):
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] + 2 * differential
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] + differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] + differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp.txt")
+    gen_pbs("pbs1")
+    threads(1)
+    raw_data[:] = reset[:]
+
+# (0,+y,+z)
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] + differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] + differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp2.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp2.txt")
+    gen_pbs("pbs2")
+    threads(2)
+    raw_data[:] = reset[:]
+
+# (-2x,+y,+z)
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] - 2 * differential
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] + differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] + differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp3.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp3.txt")
+    gen_pbs("pbs3")
+    threads(3)
+    raw_data[:] = reset[:]
+
+# (+2x,-y,+z)
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] + 2 * differential
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] - differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] + differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp4.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp4.txt")
+    gen_pbs("pbs4")
+    threads(4)
+    raw_data[:] = reset[:]
+
+# (0,-y,+z)
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] - differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] + differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp5.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp5.txt")
+    gen_pbs("pbs5")
+    threads(5)
+    raw_data[:] = reset[:]
+
+# (-2x,-y,+z)
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] - 2 * differential
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] - differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] + differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp6.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp6.txt")
+    gen_pbs("pbs6")
+    threads(6)
+    raw_data[:] = reset[:]
+
+# (+2x,+y,-z)
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] + 2 * differential
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] + differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp7.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp7.txt")
+    gen_pbs("pbs7")
+    threads(7)
+    raw_data[:] = reset[:]
+
+# (0,+y,-z)
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] + differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp8.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp8.txt")
+    gen_pbs("pbs8")
+    threads(8)
+    raw_data[:] = reset[:]
+
+# (-2x,+y,-z)
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] - 2 * differential
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] + differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp9.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp9.txt")
+    gen_pbs("pbs9")
+    threads(9)
+    raw_data[:] = reset[:]
+
+# (+2x,-y,-z)
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] + 2 * differential
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] - differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp10.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp10.txt")
+    gen_pbs("pbs10")
+    threads(10)
+    raw_data[:] = reset[:]
+
+# (0,-y,-z)
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] - differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp11.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp11.txt")
+    gen_pbs("pbs11")
+    threads(11)
+    raw_data[:] = reset[:]
+
+# (-2x,-y,-z)
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] - 2 * differential
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] - differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp12.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp12.txt")
+    gen_pbs("pbs12")
+    threads(12)
+    raw_data[:] = reset[:]
+
+# (-2x,+y,-z)
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] - 2 * differential
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] + differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp9.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp9.txt")
+    gen_pbs("pbs9")
+    threads(9)
+    raw_data[:] = reset[:]
+
+# (+2x,-y,-z)
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] + 2 * differential
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] - differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp10.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp10.txt")
+    gen_pbs("pbs10")
+    threads(10)
+    raw_data[:] = reset[:]
+
+# (0,-y,-z)
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] - differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp11.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp11.txt")
+    gen_pbs("pbs11")
+    threads(11)
+    raw_data[:] = reset[:]
+
+# (-2x,-y,-z)
+    raw_data[zipped[paired]] = raw_data[zipped[paired]] - 2 * differential
+    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] - differential
+    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    data = np.column_stack((labels,raw_data))
+    np.savetxt("tmp12.txt", data, delimiter=" ", fmt='%s')
+    print(data)
+    gen_com("tmp12.txt")
+    gen_pbs("pbs12")
+    threads(12)
+    raw_data[:] = reset[:]
 
 def fourth_geometries():
     for i in range(fourth_array_shape[0]):
@@ -1356,19 +1808,25 @@ def fourth_geometries():
 #            fourth_pairs(zipped,0,1)
             print("Paired Term")
         elif zipped[0] == zipped[1]:
+            fourth_doubles(zipped,0,2,3)
             print("Double Term")
         elif zipped[0] == zipped[2]:
+            fourth_doubles(zipped,0,1,3)
             print("Double Term")
         elif zipped[0] == zipped[3]:
+            fourth_doubles(zipped,0,1,2)
             print("Double Term")
         elif zipped[1] == zipped[2]:
+            fourth_doubles(zipped,1,0,3)
             print("Double Term")
         elif zipped[1] == zipped[3]:
+            fourth_doubles(zipped,1,0,2)
             print("Double Term")
         elif zipped[2] == zipped[3]:
+            fourth_doubles(zipped,2,0,1)
             print("Double Term")
         else:
-            print("Unclassified?")
+            print("Single Term")
 
         fourth_row_list.clear()
         fourth_col_list.clear()
