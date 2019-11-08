@@ -1127,12 +1127,20 @@ print(fourth_array)
 
 fourth_row_list = []
 fourth_col_list = []
+fourth_energy_array = []
 
 def fourth_quadruple_derivative():
     print(a,b,c,d,e)
     quadruple_energy = (float(a[0] - 4*b[0] + 6*c[0] - 4*d[0] + e[0]))/((2*differential)**4)
     quadruple_energy = (quadruple_energy * (0.529177208)**4)
+    fourth_energy_array.append(quadruple_energy)
     print(quadruple_energy)
+
+    a.clear()
+    b.clear()
+    c.clear()
+    d.clear()
+    e.clear()
 
 def fourth_quadruple(zipped):
     raw_data[zipped[0]] = raw_data[zipped[0]] + 4 * differential
@@ -1195,16 +1203,27 @@ def fourth_quadruple(zipped):
 
 
 def fourth_triple_derivative():
+    print(a,b,c,d,e,ff,g,h)
     fourth_triple_energy = ((float(a[0])
                         -3*float(b[0])
                         +3*float(c[0])
                         -float(d[0])
                         -float(e[0])
-                        +3*float(f[0])
+                        +3*float(ff[0])
                         -3*float(g[0])
                         +float(h[0]))/((16*differential**4)))
     fourth_triple_energy = (fourth_triple_energy * (0.529177208)**4)
+    fourth_energy_array.append(fourth_triple_energy)
     print(fourth_triple_energy)
+
+    a.clear()
+    b.clear()
+    c.clear()
+    d.clear()
+    e.clear()
+    ff.clear()
+    g.clear()
+    h.clear()
 
 def fourth_triple(zipped, paired, unpaired):
     raw_data[zipped[paired]] = raw_data[zipped[paired]] + 3 * differential
@@ -1306,7 +1325,17 @@ def fourth_triple(zipped, paired, unpaired):
 def fourth_pairs_derivative():
     fourth_pair_energy = (1/16*reference**4)*(a[0]+b[0]+c[0]+d[0]-2*e[0]-2*ff[0]-2*g[0]-2*h[0]+4*reference)
     fourth_pair_energy = (fourth_pair_energy * (0.529177208)**4)
+    fourth_energy_array.append(fourth_pair_energy)
     print(fourth_pair_energy)
+
+    a.clear()
+    b.clear()
+    c.clear()
+    d.clear()
+    e.clear()
+    ff.clear()
+    g.clear()
+    h.clear()
 
 def fourth_pairs(zipped,pair1,pair2):
     #(+2x,+2y)
@@ -1428,7 +1457,10 @@ def fourth_doubles_derivative():
                     - 2*zed[10]
                     + zed[11]))
     fourth_doubles_E = (fourth_double_E * (0.529177208)**4)
+    fourth_energy_array.append(fourth_double_E)
     print(fourth_double_E)
+
+    zed.clear()
 
 def fourth_doubles(paired,unpaired1,unpaired2):
 #(+2x,+y,+z)
@@ -1572,18 +1604,18 @@ def fourth_doubles(paired,unpaired1,unpaired2):
     raw_data[:] = reset[:]
 
     run_jobs()
-    extract_energy(1)
-    extract_energy(2)
-    extract_energy(3)
-    extract_energy(4)
-    extract_energy(5)
-    extract_energy(6)
-    extract_energy(7)
-    extract_energy(8)
-    extract_energy(9)
-    extract_energy(10)
-    extract_energy(11)
-    extract_energy(12)
+    extract_energy(1,4)
+    extract_energy(2,4)
+    extract_energy(3,4)
+    extract_energy(4,4)
+    extract_energy(5,4)
+    extract_energy(6,4)
+    extract_energy(7,4)
+    extract_energy(8,4)
+    extract_energy(9,4)
+    extract_energy(10,4)
+    extract_energy(11,4)
+    extract_energy(12,4)
 
     fourth_doubles_derivative()
     subprocess.call("rm input*.com*", shell=True)
@@ -1591,10 +1623,35 @@ def fourth_doubles(paired,unpaired1,unpaired2):
     subprocess.call("rm input*.pbs*", shell=True)
     subprocess.call("rm input*.xml*", shell=True)
 
+def fourth_singles_derivative():
+    fourth_singles_energy = (zed[0]
+                            -zed[1]
+                            -zed[2]
+                            +zed[3]
+                            -zed[4]
+                            +zed[5]
+                            +zed[6]
+                            -zed[7]
+                            -zed[8]
+                            +zed[9]
+                            +zed[10]
+                            -zed[11]
+                            +zed[12]
+                            -zed[13]
+                            -zed[14]
+                            +zed[15])/(16*(differential**4))
+
+    fourth_singles_energy = (fourth_singles_energy * (0.529177208)**4)
+    fourth_energy_array.append(fourth_singles_energy)
+    print(fourth_double_E)
+
+    zed.clear()
+
 def fourth_singles(zipped):
-    raw_data[zipped[paired]] = raw_data[zipped[paired]] + 2 * differential
-    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] + differential
-    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] + differential
+    raw_data[zipped[0]] = raw_data[zipped[0]] +  differential
+    raw_data[zipped[1]] = raw_data[zipped[1]] + differential
+    raw_data[zipped[2]] = raw_data[zipped[2]] + differential
+    raw_data[zipped[3]] = raw_data[zipped[3]] + differential
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp.txt", data, delimiter=" ", fmt='%s')
     print(data)
@@ -1604,8 +1661,10 @@ def fourth_singles(zipped):
     raw_data[:] = reset[:]
 
 # (0,+y,+z)
-    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] + differential
-    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] + differential
+    raw_data[zipped[0]] = raw_data[zipped[0]] -  differential
+    raw_data[zipped[1]] = raw_data[zipped[1]] + differential
+    raw_data[zipped[2]] = raw_data[zipped[2]] + differential
+    raw_data[zipped[3]] = raw_data[zipped[3]] + differential
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp2.txt", data, delimiter=" ", fmt='%s')
     print(data)
@@ -1615,9 +1674,10 @@ def fourth_singles(zipped):
     raw_data[:] = reset[:]
 
 # (-2x,+y,+z)
-    raw_data[zipped[paired]] = raw_data[zipped[paired]] - 2 * differential
-    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] + differential
-    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] + differential
+    raw_data[zipped[0]] = raw_data[zipped[0]] +  differential
+    raw_data[zipped[1]] = raw_data[zipped[1]] - differential
+    raw_data[zipped[2]] = raw_data[zipped[2]] + differential
+    raw_data[zipped[3]] = raw_data[zipped[3]] + differential
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp3.txt", data, delimiter=" ", fmt='%s')
     print(data)
@@ -1627,9 +1687,10 @@ def fourth_singles(zipped):
     raw_data[:] = reset[:]
 
 # (+2x,-y,+z)
-    raw_data[zipped[paired]] = raw_data[zipped[paired]] + 2 * differential
-    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] - differential
-    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] + differential
+    raw_data[zipped[0]] = raw_data[zipped[0]] -  differential
+    raw_data[zipped[1]] = raw_data[zipped[1]] - differential
+    raw_data[zipped[2]] = raw_data[zipped[2]] + differential
+    raw_data[zipped[3]] = raw_data[zipped[3]] + differential
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp4.txt", data, delimiter=" ", fmt='%s')
     print(data)
@@ -1639,8 +1700,10 @@ def fourth_singles(zipped):
     raw_data[:] = reset[:]
 
 # (0,-y,+z)
-    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] - differential
-    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] + differential
+    raw_data[zipped[0]] = raw_data[zipped[0]] +  differential
+    raw_data[zipped[1]] = raw_data[zipped[1]] + differential
+    raw_data[zipped[2]] = raw_data[zipped[2]] - differential
+    raw_data[zipped[3]] = raw_data[zipped[3]] + differential
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp5.txt", data, delimiter=" ", fmt='%s')
     print(data)
@@ -1650,9 +1713,10 @@ def fourth_singles(zipped):
     raw_data[:] = reset[:]
 
 # (-2x,-y,+z)
-    raw_data[zipped[paired]] = raw_data[zipped[paired]] - 2 * differential
-    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] - differential
-    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] + differential
+    raw_data[zipped[0]] = raw_data[zipped[0]] -  differential
+    raw_data[zipped[1]] = raw_data[zipped[1]] + differential
+    raw_data[zipped[2]] = raw_data[zipped[2]] - differential
+    raw_data[zipped[3]] = raw_data[zipped[3]] + differential
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp6.txt", data, delimiter=" ", fmt='%s')
     print(data)
@@ -1662,9 +1726,10 @@ def fourth_singles(zipped):
     raw_data[:] = reset[:]
 
 # (+2x,+y,-z)
-    raw_data[zipped[paired]] = raw_data[zipped[paired]] + 2 * differential
-    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] + differential
-    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    raw_data[zipped[0]] = raw_data[zipped[0]] +  differential
+    raw_data[zipped[1]] = raw_data[zipped[1]] - differential
+    raw_data[zipped[2]] = raw_data[zipped[2]] - differential
+    raw_data[zipped[3]] = raw_data[zipped[3]] + differential
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp7.txt", data, delimiter=" ", fmt='%s')
     print(data)
@@ -1674,8 +1739,10 @@ def fourth_singles(zipped):
     raw_data[:] = reset[:]
 
 # (0,+y,-z)
-    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] + differential
-    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    raw_data[zipped[0]] = raw_data[zipped[0]] -  differential
+    raw_data[zipped[1]] = raw_data[zipped[1]] - differential
+    raw_data[zipped[2]] = raw_data[zipped[2]] - differential
+    raw_data[zipped[3]] = raw_data[zipped[3]] + differential
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp8.txt", data, delimiter=" ", fmt='%s')
     print(data)
@@ -1685,9 +1752,10 @@ def fourth_singles(zipped):
     raw_data[:] = reset[:]
 
 # (-2x,+y,-z)
-    raw_data[zipped[paired]] = raw_data[zipped[paired]] - 2 * differential
-    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] + differential
-    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    raw_data[zipped[0]] = raw_data[zipped[0]] +  differential
+    raw_data[zipped[1]] = raw_data[zipped[1]] + differential
+    raw_data[zipped[2]] = raw_data[zipped[2]] + differential
+    raw_data[zipped[3]] = raw_data[zipped[3]] - differential
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp9.txt", data, delimiter=" ", fmt='%s')
     print(data)
@@ -1697,9 +1765,10 @@ def fourth_singles(zipped):
     raw_data[:] = reset[:]
 
 # (+2x,-y,-z)
-    raw_data[zipped[paired]] = raw_data[zipped[paired]] + 2 * differential
-    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] - differential
-    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    raw_data[zipped[0]] = raw_data[zipped[0]] -  differential
+    raw_data[zipped[1]] = raw_data[zipped[1]] + differential
+    raw_data[zipped[2]] = raw_data[zipped[2]] + differential
+    raw_data[zipped[3]] = raw_data[zipped[3]] - differential
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp10.txt", data, delimiter=" ", fmt='%s')
     print(data)
@@ -1709,8 +1778,10 @@ def fourth_singles(zipped):
     raw_data[:] = reset[:]
 
 # (0,-y,-z)
-    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] - differential
-    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    raw_data[zipped[0]] = raw_data[zipped[0]] +  differential
+    raw_data[zipped[1]] = raw_data[zipped[1]] - differential
+    raw_data[zipped[2]] = raw_data[zipped[2]] + differential
+    raw_data[zipped[3]] = raw_data[zipped[3]] - differential
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp11.txt", data, delimiter=" ", fmt='%s')
     print(data)
@@ -1720,9 +1791,10 @@ def fourth_singles(zipped):
     raw_data[:] = reset[:]
 
 # (-2x,-y,-z)
-    raw_data[zipped[paired]] = raw_data[zipped[paired]] - 2 * differential
-    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] - differential
-    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    raw_data[zipped[0]] = raw_data[zipped[0]] -  differential
+    raw_data[zipped[1]] = raw_data[zipped[1]] - differential
+    raw_data[zipped[2]] = raw_data[zipped[2]] + differential
+    raw_data[zipped[3]] = raw_data[zipped[3]] - differential
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp12.txt", data, delimiter=" ", fmt='%s')
     print(data)
@@ -1732,51 +1804,80 @@ def fourth_singles(zipped):
     raw_data[:] = reset[:]
 
 # (-2x,+y,-z)
-    raw_data[zipped[paired]] = raw_data[zipped[paired]] - 2 * differential
-    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] + differential
-    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    raw_data[zipped[0]] = raw_data[zipped[0]] +  differential
+    raw_data[zipped[1]] = raw_data[zipped[1]] + differential
+    raw_data[zipped[2]] = raw_data[zipped[2]] - differential
+    raw_data[zipped[3]] = raw_data[zipped[3]] - differential
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp9.txt", data, delimiter=" ", fmt='%s')
     print(data)
     gen_com("tmp9.txt")
     gen_pbs("pbs9")
-    threads(9)
+    threads(13)
     raw_data[:] = reset[:]
 
 # (+2x,-y,-z)
-    raw_data[zipped[paired]] = raw_data[zipped[paired]] + 2 * differential
-    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] - differential
-    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    raw_data[zipped[0]] = raw_data[zipped[0]] -  differential
+    raw_data[zipped[1]] = raw_data[zipped[1]] + differential
+    raw_data[zipped[2]] = raw_data[zipped[2]] - differential
+    raw_data[zipped[3]] = raw_data[zipped[3]] - differential
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp10.txt", data, delimiter=" ", fmt='%s')
     print(data)
     gen_com("tmp10.txt")
     gen_pbs("pbs10")
-    threads(10)
+    threads(14)
     raw_data[:] = reset[:]
 
 # (0,-y,-z)
-    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] - differential
-    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    raw_data[zipped[0]] = raw_data[zipped[0]] +  differential
+    raw_data[zipped[1]] = raw_data[zipped[1]] - differential
+    raw_data[zipped[2]] = raw_data[zipped[2]] - differential
+    raw_data[zipped[3]] = raw_data[zipped[3]] - differential
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp11.txt", data, delimiter=" ", fmt='%s')
     print(data)
     gen_com("tmp11.txt")
     gen_pbs("pbs11")
-    threads(11)
+    threads(15)
     raw_data[:] = reset[:]
 
 # (-2x,-y,-z)
-    raw_data[zipped[paired]] = raw_data[zipped[paired]] - 2 * differential
-    raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] - differential
-    raw_data[zipped[unpaired2]] = raw_data[zipped[unpaired2]] - differential
+    raw_data[zipped[0]] = raw_data[zipped[0]] -  differential
+    raw_data[zipped[1]] = raw_data[zipped[1]] - differential
+    raw_data[zipped[2]] = raw_data[zipped[2]] - differential
+    raw_data[zipped[3]] = raw_data[zipped[3]] - differential
     data = np.column_stack((labels,raw_data))
     np.savetxt("tmp12.txt", data, delimiter=" ", fmt='%s')
     print(data)
     gen_com("tmp12.txt")
     gen_pbs("pbs12")
-    threads(12)
+    threads(16)
     raw_data[:] = reset[:]
+
+    run_jobs()
+    extract_energy(1,4)
+    extract_energy(2,4)
+    extract_energy(3,4)
+    extract_energy(4,4)
+    extract_energy(5,4)
+    extract_energy(6,4)
+    extract_energy(7,4)
+    extract_energy(8,4)
+    extract_energy(9,4)
+    extract_energy(10,4)
+    extract_energy(11,4)
+    extract_energy(12,4)
+    extract_energy(13,4)
+    extract_energy(14,4)
+    extract_energy(15,4)
+    extract_energy(16,4)
+
+    fourth_singles_derivative()
+    subprocess.call("rm input*.com*", shell=True)
+    subprocess.call("rm input*.out*", shell=True)
+    subprocess.call("rm input*.pbs*", shell=True)
+    subprocess.call("rm input*.xml*", shell=True)
 
 def fourth_geometries():
     for i in range(fourth_array_shape[0]):
@@ -1826,11 +1927,40 @@ def fourth_geometries():
             fourth_doubles(zipped,2,0,1)
             print("Double Term")
         else:
+            fourth_singles(zipped)
             print("Single Term")
 
         fourth_row_list.clear()
         fourth_col_list.clear()
 
 fourth_geometries()
+
+print(fourth_energy_array)
+
+"""
+def determinefourthsize(size):
+    total_points_tally = []
+
+    size_of_data = size
+    for i in range(1,size_of_data+1,1):
+        for j in range(i):
+            total_points_tally.append(j+1)
+
+    total_points = int(sum(total_points_tally))
+    return total_points//3
+
+print(third_energy_array)
+
+np.set_printoptions(suppress=True,
+   formatter={'float_kind':'{:20.10f}'.format})
+
+array = np.reshape(third_energy_array,(determinethirdsize(num_of_jobs),3))
+print(array)
+
+e = open('fort.30','w+')
+
+#Generalize this.
+np.savetxt('fort.30',array,header='    3   165',fmt='%20.10f',comments='')
+"""
 
 print(process.memory_info()[0])
