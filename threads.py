@@ -94,7 +94,7 @@ def gen_com(name):
     temp.close()
     subprocess.call("rm tmp*.txt", shell=True)
 
-"""
+
 def gen_pbs(name):
     filename = name
     if filename == "pbs1":
@@ -150,7 +150,7 @@ def gen_pbs(name):
     f.write("date\n\n")
 
     f.write("rm -rf $TMPDIR")
-"""
+
 
 def sub_job(args):
     subprocess.call("mpiexec molpro.exe input%d.com" %args,shell=True)
@@ -324,7 +324,7 @@ def extract_energy(numberofinput,derivative):
                 fourth_templist.append(float(line[3]))
                 zz.close()
     elif numberofinput == 15:
-        zz = open("input12.out", 'r')
+        zz = open("input15.out", 'r')
         zzz = zz.readlines()
         for line in zzz:
             if "!CCSD(T)-F12b total energy" in line:
@@ -332,7 +332,7 @@ def extract_energy(numberofinput,derivative):
                 fourth_templist.append(float(line[3]))
                 zz.close()
     elif numberofinput == 16:
-        zz = open("input12.out", 'r')
+        zz = open("input16.out", 'r')
         zzz = zz.readlines()
         for line in zzz:
             if "!CCSD(T)-F12b total energy" in line:
@@ -353,6 +353,7 @@ ten_list = []
 eleven_list = []
 twelve_list = []
 
+"""
 # First derivatives.
 # Could speed this up by removing the iterator, since there is no longer more than one item in the list.
 def first_derivative():
@@ -392,7 +393,7 @@ def second_derivative_b():
         print(second_energy_b)
         second_energy_list_b.append(second_energy_b)
         return second_energy_b
-
+"""
 """
 # FIRST DISP GENERATION
 for rows in range(size[0]):
@@ -1129,18 +1130,19 @@ fourth_row_list = []
 fourth_col_list = []
 fourth_energy_array = []
 
+fourth_templist = []
+
+
 def fourth_quadruple_derivative():
     print(a,b,c,d,e)
-    quadruple_energy = (float(a[0] - 4*b[0] + 6*c[0] - 4*d[0] + e[0]))/((2*differential)**4)
+    zed = fourth_templist
+    quadruple_energy = (float(zed[0] - 4*zed[1] + 6*zed[2] - 4*zed[3] + zed[4]))/((2*differential)**4)
     quadruple_energy = (quadruple_energy * (0.529177208)**4)
     fourth_energy_array.append(quadruple_energy)
     print(quadruple_energy)
 
-    a.clear()
-    b.clear()
-    c.clear()
-    d.clear()
-    e.clear()
+    fourth_templist.clear()
+    zed.clear()
 
 def fourth_quadruple(zipped):
     raw_data[zipped[0]] = raw_data[zipped[0]] + 4 * differential
@@ -1189,11 +1191,11 @@ def fourth_quadruple(zipped):
     raw_data[:] = reset[:]
 
     run_jobs()
-    extract_energy(1)
-    extract_energy(2)
-    extract_energy(3)
-    extract_energy(4)
-    extract_energy(5)
+    extract_energy(1,4)
+    extract_energy(2,4)
+    extract_energy(3,4)
+    extract_energy(4,4)
+    extract_energy(5,4)
 
     fourth_quadruple_derivative()
     subprocess.call("rm input*.com*", shell=True)
@@ -1204,26 +1206,21 @@ def fourth_quadruple(zipped):
 
 def fourth_triple_derivative():
     print(a,b,c,d,e,ff,g,h)
-    fourth_triple_energy = ((float(a[0])
-                        -3*float(b[0])
-                        +3*float(c[0])
-                        -float(d[0])
-                        -float(e[0])
-                        +3*float(ff[0])
-                        -3*float(g[0])
-                        +float(h[0]))/((16*differential**4)))
+    zed = fourth_templist
+    fourth_triple_energy = (zed[0]
+                        -3*zed[1]
+                        +3*zed[2]
+                        -zed[3]
+                        -zed[4]
+                        +3*zed[5]
+                        -3*zed[6]
+                        +zed[7])/((16*differential**4))
     fourth_triple_energy = (fourth_triple_energy * (0.529177208)**4)
     fourth_energy_array.append(fourth_triple_energy)
     print(fourth_triple_energy)
 
-    a.clear()
-    b.clear()
-    c.clear()
-    d.clear()
-    e.clear()
-    ff.clear()
-    g.clear()
-    h.clear()
+    fourth_templist.clear()
+    zed.clear()
 
 def fourth_triple(zipped, paired, unpaired):
     raw_data[zipped[paired]] = raw_data[zipped[paired]] + 3 * differential
@@ -1440,9 +1437,6 @@ def fourth_pairs(zipped,pair1,pair2):
     subprocess.call("rm input*.pbs*", shell=True)
     subprocess.call("rm input*.xml*", shell=True)
 
-fourth_templist = []
-zed = fourth_templist
-
 def fourth_doubles_derivative():
     fourth_double_E = ((zed[0]
                     - 2*zed[1]
@@ -1462,7 +1456,7 @@ def fourth_doubles_derivative():
 
     zed.clear()
 
-def fourth_doubles(paired,unpaired1,unpaired2):
+def fourth_doubles(zipped,paired,unpaired1,unpaired2):
 #(+2x,+y,+z)
     raw_data[zipped[paired]] = raw_data[zipped[paired]] + 2 * differential
     raw_data[zipped[unpaired1]] = raw_data[zipped[unpaired1]] + differential
@@ -1889,24 +1883,24 @@ def fourth_geometries():
         print(zipped[0],zipped[1],zipped[2],zipped[3])
         if zipped[0] == zipped[1] and zipped[1] == zipped[2] and zipped[2] == zipped[3]:
             print("Quadruple Term")
-#            fourth_quadruple(zipped)
+            fourth_quadruple(zipped)
         elif zipped[0] == zipped[1] and zipped[0] == zipped[2]:
             print("Triple Term")
-#            fourth_triple(zipped,0,3)
+            fourth_triple(zipped,0,3)
         elif zipped[0] == zipped[1] and zipped[0] == zipped[3]:
             print("Triple Term")
-#            fourth_triple(zipped,0,2)
+            fourth_triple(zipped,0,2)
         elif zipped[0] == zipped[2] and zipped[0] == zipped[3]:
             print("Triple Term")
-#            fourth_triple(zipped,0,1)
+            fourth_triple(zipped,0,1)
         elif zipped[1] == zipped[2] and zipped[1] == zipped[3]:
             print("Triple Term")
-#            fourth_triple(zipped,1,0)
+            fourth_triple(zipped,1,0)
         elif zipped[0] == zipped[1] and zipped[2] == zipped[3]:
             print("Paired Term")
-#            fourth_pairs(zipped,0,2)
+            fourth_pairs(zipped,0,2)
         elif zipped[0] == zipped[3] and zipped[1] == zipped[2]:
-#            fourth_pairs(zipped,0,1)
+            fourth_pairs(zipped,0,1)
             print("Paired Term")
         elif zipped[0] == zipped[1]:
             fourth_doubles(zipped,0,2,3)
@@ -1935,32 +1929,31 @@ def fourth_geometries():
 
 fourth_geometries()
 
-print(fourth_energy_array)
-
-"""
 def determinefourthsize(size):
     total_points_tally = []
 
     size_of_data = size
     for i in range(1,size_of_data+1,1):
         for j in range(i):
-            total_points_tally.append(j+1)
+            for k in range(j+1):
+                total_points_tally.append(k+1)
 
     total_points = int(sum(total_points_tally))
+    print(total_points)
     return total_points//3
 
-print(third_energy_array)
+print(fourth_energy_array)
 
 np.set_printoptions(suppress=True,
    formatter={'float_kind':'{:20.10f}'.format})
 
-array = np.reshape(third_energy_array,(determinethirdsize(num_of_jobs),3))
+array = np.reshape(third_energy_array,(determinefourthsize(num_of_jobs),3))
 print(array)
 
-e = open('fort.30','w+')
+e = open('fort.40','w+')
 
 #Generalize this.
-np.savetxt('fort.30',array,header='    3   165',fmt='%20.10f',comments='')
-"""
+np.savetxt('fort.40',array,header='    3   495',fmt='%20.10f',comments='')
+e.close()
 
 print(process.memory_info()[0])
