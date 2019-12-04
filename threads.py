@@ -1947,7 +1947,7 @@ print(fourth_energy_array)
 np.set_printoptions(suppress=True,
    formatter={'float_kind':'{:20.10f}'.format})
 
-array = np.reshape(third_energy_array,(determinefourthsize(num_of_jobs),3))
+array = np.reshape(fourth_energy_array,(determinefourthsize(num_of_jobs),3))
 print(array)
 
 e = open('fort.40','w+')
