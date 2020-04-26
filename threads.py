@@ -340,6 +340,9 @@ def extract_energy(numberofinput,derivative):
                 fourth_templist.append(float(line[3]))
                 zz.close()
 
+print("Welcome to CartesianDif, a numerical approach to spectoscopic data.")
+print("Author: Michael Valencia")
+
 positives = []
 negatives = []
 minusplus = []
@@ -456,7 +459,6 @@ x_list = 0
 print(zero_size)
 
 """
-#Array generation: these will be edited later to work for larger arrays.
 array = []
 for atom1 in range(size[0]):
     coordinate_list1 = []
@@ -1930,7 +1932,7 @@ def fourth_geometries():
 fourth_geometries()
 
 def determinefourthsize(size):
-    total_points_tally = []
+    total__tally = []
 
     size_of_data = size
     for i in range(1,size_of_data+1,1):
